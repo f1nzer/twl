@@ -19,7 +19,9 @@ const router = createBrowserRouter([
     path: "/game",
     element: <GamePage />,
   },
-]);
+], {
+  basename: "/twl",
+});
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
