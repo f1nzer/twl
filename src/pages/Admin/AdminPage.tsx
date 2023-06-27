@@ -11,7 +11,7 @@ export const AdminPage = () => {
   const sendState = () => {
     PeerState.send({
       bankTotal: 10,
-      players: [],
+      players: [{name: "КОНСТАНТИН"}, {name:"СЕМЁН"}, {name: "АЛЕКСЕЙ"}],
       status: GameStatus.LOBBY,
     });
   };
