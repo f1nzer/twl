@@ -21,8 +21,12 @@ export const PeerState = {
       return;
     }
 
-    peer = new Peer();
-    peer.on("open", params.onIdReceived);
+    const peerIdToUse = window.localStorage.getItem("peerId");
+    peer = peerIdToUse ? new Peer(peerIdToUse) : new Peer();
+    peer.on("open", (peerId) => {
+      window.localStorage.setItem("peerId", peerId);
+      params.onIdReceived(peerId);
+    });
     peer.on("error", (error) => {
       console.error(error);
     });

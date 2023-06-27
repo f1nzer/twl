@@ -14,7 +14,6 @@ export enum GameStatus {
 
 export interface Player {
   name: string;
-  avatarUrl?: string;
 }
 
 export interface RoundState {

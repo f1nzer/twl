@@ -1,47 +1,23 @@
 import { useEffect, useState } from "react";
 import { PeerState } from "../../services/peer-service";
-import { GameState, GameStatus, Player } from "../../models/state";
-import { Avatar } from "@mui/material";
-import Grid from '@mui/material/Unstable_Grid2';
-import { AvatarGenerator } from "random-avatar-generator";
-
-interface LobbyViewProps {
-  state: GameState;
-}
-
-interface PlayerViewProps {
-  players: Player[]
-}
-
-export const LobbyView = ({ state }: LobbyViewProps) => {
-  return <PlayersView players={state.players}/>;
-};
-
-export const PlayersView = ({players}: PlayerViewProps) => {
-  const generator = new AvatarGenerator();
-  return (
-    <Grid 
-    container 
-    spacing={3} 
-    alignItems="center"
-    justifyContent="center">
-      {players.map((player, index) => {
-        return ( 
-          <Grid key={"player_" + index} justifyContent="center" alignItems="center" >
-            <Avatar variant="rounded" sx={{ width: 150, height: 150, paddingBottom: 1 }} src={player.avatarUrl ?? generator.generateRandomAvatar(player.name) as string}/>
-            <div style={{ textAlign: "center"}}>{player.name}</div>
-        </Grid>
-        )
-      })}
-    </Grid>
-  )
-}
+import { GameState, GameStatus } from "../../models/state";
+import { LobbyView } from "./LobbyView";
+import { RoundView } from "./RoundView";
 
 export const GamePage = () => {
   const [gameState, setGameState] = useState<GameState>({
     bankTotal: 0,
-    status: GameStatus.LOBBY,
-    players: [],
+    status: GameStatus.ROUND,
+    round: {
+      activeQuestionText: "Какой город является столицей России?",
+      activePlayersIndexes: [0, 1, 2],
+      activePlayerIndex: 0,
+      bankTotal: 10000,
+      priceValues: [1000, 2000, 5000, 10000, 20000],
+      currentPriceIndex: 0,
+      roundDuration: 60,
+    },
+    players: [{ name: "КОНСТАНТИН" }, { name: "СЕМЁН" }, { name: "АЛЕКСЕЙ" }],
   });
 
   useEffect(() => {
@@ -57,6 +33,10 @@ export const GamePage = () => {
 
   if (gameState.status === GameStatus.LOBBY) {
     return <LobbyView state={gameState} />;
+  }
+
+  if (gameState.status === GameStatus.ROUND) {
+    return <RoundView state={gameState} />;
   }
 
   return <>game page</>;
