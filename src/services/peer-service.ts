@@ -3,7 +3,7 @@ import { GameState } from "../models/state";
 
 interface InitParams {
   onIdReceived: (id: string) => void;
-  onInConnection: () => void;
+  onInConnection?: () => void;
 }
 
 interface ConnectParams {
@@ -28,7 +28,9 @@ export const PeerState = {
     });
     // on incoming connection only
     peer.on("connection", (conn) => {
-      conn.on("open", params.onInConnection);
+      conn.on("open", () => {
+        params.onInConnection && params.onInConnection();
+      });
       conn.on("data", (data) => {
         if (onDataReceivedFunc) {
           onDataReceivedFunc(data as GameState);

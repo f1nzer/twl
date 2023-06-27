@@ -1,12 +1,31 @@
+import { useSearchParams } from "react-router-dom";
 import { GameStatus } from "../../models/state";
 import { PeerState } from "../../services/peer-service";
+import { useEffect, useState } from "react";
+import { Button } from "@mui/material";
 
 export const AdminPage = () => {
+  const [searchParams] = useSearchParams();
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+
   const sendState = () => {
     PeerState.send({
       bankTotal: 10,
       players: [],
       status: GameStatus.LOBBY,
+    });
+  };
+
+  const connect = () => {
+    const gameId = searchParams.get("gameId") || "";
+    PeerState.init({
+      onIdReceived: () =>
+        PeerState.connect({
+          peerId: gameId,
+          onOutConnection: () => {
+            setIsConnected(true);
+          },
+        }),
     });
   };
 
@@ -20,5 +39,16 @@ export const AdminPage = () => {
 
   // TODO: debug button to RESET state to start from the beginning
 
-  return <button onClick={() => sendState()}>SEND STATE</button>;
+  return (
+    <>
+      <ul>
+        <li>
+          <Button onClick={() => connect()}>CONNECT</Button>
+        </li>
+        <li>
+          <Button onClick={() => sendState()}>SEND STATE</Button>
+        </li>
+      </ul>
+    </>
+  );
 };
