@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import { GameStatus } from "../../models/state";
 import { PeerState } from "../../services/peer-service";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@mui/material";
 
 export const AdminPage = () => {
@@ -42,9 +42,11 @@ export const AdminPage = () => {
   return (
     <>
       <ul>
-        <li>
-          <Button onClick={() => connect()}>CONNECT</Button>
-        </li>
+        {!isConnected && (
+          <li>
+            <Button onClick={() => connect()}>CONNECT</Button>
+          </li>
+        )}
         <li>
           <Button onClick={() => sendState()}>SEND STATE</Button>
         </li>

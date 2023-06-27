@@ -5,8 +5,7 @@ interface PlayerControlsProps {
 }
 
 const PlayerControl = ({ gameId }: PlayerControlsProps) => {
-
-  return "test!";
+  return `test: ${gameId}`;
 };
 
 export const PlayerPage = () => {
