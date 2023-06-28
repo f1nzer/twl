@@ -25,7 +25,6 @@ export const Timer = ({ seconds }: TimerProps) => {
       <Typography
         padding={4}
         borderRadius={40}
-        width="1em"
         textAlign="center"
         bgcolor="red"
         color="white"
