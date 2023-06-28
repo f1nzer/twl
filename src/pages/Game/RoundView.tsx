@@ -1,7 +1,8 @@
-import { Grid, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { GameState } from "../../models/state";
 import { BankView } from "./BankView";
-import { PlayersView } from "./PlayersView";
+import { PlayerView } from "./PlayersView";
+import { Timer } from "./Timer";
 
 interface RoundViewProps {
   state: GameState;
@@ -18,19 +19,26 @@ export const RoundView = ({ state }: RoundViewProps) => {
   });
 
   return (
-    <Stack spacing={10} sx={{ minHeight: "100vh" }}>
-      <PlayersView
-        players={filteredPlayers}
-        activePlayerIndex={round.activePlayerIndex}
-      />
-      <Grid container alignItems="center" justifyContent="center">
-        <Grid item xs={4}>
-          <BankView state={state} />
-        </Grid>
-        <Grid item xs={8}>
-          <Typography variant="h3">{round.activeQuestionText}</Typography>
-        </Grid>
-      </Grid>
+    <Stack
+      height="100vh"
+      spacing={10}
+      marginX={10}
+      direction="row"
+      alignItems="center"
+      justifyContent="center"
+    >
+      <Box>
+        <BankView state={state} />
+      </Box>
+      <Box>
+        <Stack spacing={6}>
+          <PlayerView player={filteredPlayers[round.activePlayerIndex]} />
+          <Typography variant="h3" textAlign="center">
+            {round.activeQuestionText}
+          </Typography>
+          <Timer seconds={round.roundDuration} />
+        </Stack>
+      </Box>
     </Stack>
   );
 };

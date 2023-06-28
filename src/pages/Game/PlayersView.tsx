@@ -6,44 +6,33 @@ const generator = new AvatarGenerator();
 
 interface PlayerViewProps {
   player: Player;
-  isActive: boolean;
 }
 
-export const PlayerView = ({ player, isActive }: PlayerViewProps) => {
+export const PlayerView = ({ player }: PlayerViewProps) => {
   return (
-    <Box
-      sx={{
-        bgcolor: isActive ? "green" : "transparent",
-      }}
-    >
-      <Avatar
-        variant="rounded"
-        sx={{ width: 150, height: 150, paddingBottom: 1 }}
-        src={generator.generateRandomAvatar(player.name)}
-      />
-      <Typography style={{ textAlign: "center" }}>{player.name}</Typography>
+    <Box display="flex" justifyContent="center" alignItems="center">
+      <Stack>
+        <Avatar
+          variant="rounded"
+          sx={{ width: 150, height: 150, paddingBottom: 1 }}
+          src={generator.generateRandomAvatar(player.name)}
+        />
+        <Typography style={{ textAlign: "center" }}>{player.name}</Typography>
+      </Stack>
     </Box>
   );
 };
 
 interface PlayersViewProps {
   players: Player[];
-  activePlayerIndex?: number;
 }
 
-export const PlayersView = ({
-  players,
-  activePlayerIndex,
-}: PlayersViewProps) => {
+export const PlayersView = ({ players }: PlayersViewProps) => {
   return (
     <Box>
       <Stack spacing={2} direction={"row"}>
         {players.map((player, index) => (
-          <PlayerView
-            key={`player_${index}`}
-            player={player}
-            isActive={index === activePlayerIndex}
-          />
+          <PlayerView key={`player_${index}`} player={player} />
         ))}
       </Stack>
     </Box>

@@ -50,7 +50,7 @@ function App() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <QRCode value={window.location + adminGameUrl} />
+                  <QRCode value={`${location.href}#/${adminGameUrl}`} />
                 </Link>
               )}
             </div>

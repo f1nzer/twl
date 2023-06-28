@@ -1,4 +1,4 @@
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { GameState } from "../../models/state";
 
 interface BankViewProps {
@@ -26,8 +26,8 @@ const BankItemView = ({ value, isActive, isSummary }: BankItemViewProps) => {
   return (
     <Box
       sx={{
-        height: isSummary ? "4em" : "3em",
-        width: isSummary ? "14em" : "12em",
+        height: isSummary ? "5em" : "3em",
+        width: isSummary ? "18em" : "12em",
         alignItems: "center",
         justifyContent: "center",
         display: "flex",
@@ -52,13 +52,7 @@ export const BankView = ({ state }: BankViewProps) => {
 
   return (
     <>
-      <Grid
-        container
-        spacing={0}
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-      >
+      <Stack spacing={6} direction="column" alignItems="center" justifyContent="center">
         <Stack spacing={2}>
           {priceValues.map((value, index) => (
             <BankItemView
@@ -70,10 +64,10 @@ export const BankView = ({ state }: BankViewProps) => {
             />
           ))}
         </Stack>
-        <Box mt={4}>
+        <Box>
           <BankItemView isSummary value={`БАНК: ${round.bankTotal}`} />
         </Box>
-      </Grid>
+      </Stack>
     </>
   );
 };

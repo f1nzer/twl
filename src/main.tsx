@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { RouterProvider, createHashRouter } from "react-router-dom";
 import App from "./pages/Main/App.tsx";
 import { AdminPage } from "./pages/Admin/AdminPage.tsx";
 import { GamePage } from "./pages/Game/GamePage.tsx";
@@ -11,7 +11,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-const router = createBrowserRouter(
+const router = createHashRouter(
   [
     {
       path: "/",
@@ -29,10 +29,7 @@ const router = createBrowserRouter(
       path: "/player",
       element: <PlayerPage />,
     },
-  ],
-  {
-    basename: "/twl",
-  }
+  ]
 );
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
