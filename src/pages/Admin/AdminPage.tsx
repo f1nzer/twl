@@ -3,6 +3,7 @@ import { GameState, GameStatus } from "../../models/state";
 import { ManageRoundView } from "./ManageRoundView";
 import { usePeer } from "../../hooks/usePeer";
 import { useEffect } from "react";
+import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
 
 const gameState: GameState = {
   bankTotal: 10,
@@ -33,7 +34,7 @@ export const AdminPage = () => {
       return;
     }
 
-    connect(gameId);
+    connect(gameId, ADMIN_CONNECTION_LABEL);
   }, [connect, isConnected, peerId, searchParams]);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export const AdminPage = () => {
       return;
     }
 
-    send(gameState);
+    send(gameState, ADMIN_CONNECTION_LABEL);
   }, [isConnected, send]);
 
   // TODO: add "new player" buttons

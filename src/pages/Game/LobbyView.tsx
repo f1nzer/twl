@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { Stack } from "@mui/material";
 import { GameState } from "../../models/state";
 import { PlayersView } from "./PlayersView";
 
@@ -8,16 +8,13 @@ interface LobbyViewProps {
 
 export const LobbyView = ({ state }: LobbyViewProps) => {
   return (
-    <Grid container spacing={4} height="100vh">
-      <Grid
-        item
-        xs={12}
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <PlayersView players={state.players} />
-      </Grid>
-    </Grid>
+    <Stack
+      direction="column"
+      height="100vh"
+      alignItems="center"
+      justifyContent="center"
+    >
+      <PlayersView players={state.players} />
+    </Stack>
   );
 };

@@ -2,6 +2,7 @@ import { Button, Grid, Stack } from "@mui/material";
 import { GameState, GameStatus } from "../../models/state";
 import { QuestionStorage } from "../../services/question-storage";
 import { usePeer } from "../../hooks/usePeer";
+import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
 
 interface ManageRoundViewProps {
   state: GameState;
@@ -63,17 +64,17 @@ export const ManageRoundView = ({ state }: ManageRoundViewProps) => {
 
   const onCorrectAnswerClick = () => {
     correctAnswer(state);
-    send(state);
+    send(state, ADMIN_CONNECTION_LABEL);
   };
 
   const onIncorrectAnswerClick = () => {
     incorrectAnswer(state);
-    send(state);
+    send(state, ADMIN_CONNECTION_LABEL);
   };
 
   const onSaveBankClick = () => {
     saveBank(state);
-    send(state);
+    send(state, ADMIN_CONNECTION_LABEL);
   };
 
   return (

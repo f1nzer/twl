@@ -3,17 +3,15 @@ import { PeerContext } from "./PeerContext";
 import Peer, { DataConnection } from "peerjs";
 import { GameState } from "../models/state";
 
-interface PeerContextProviderProps {
-  test?: string;
-}
-
 export const PeerContextProvider = ({
   children,
-}: React.PropsWithChildren<PeerContextProviderProps>) => {
+}: React.PropsWithChildren<unknown>) => {
   const [peer, setPeer] = useState<Peer>();
   const [connected, setConnected] = useState<boolean>(false);
   const [peerId, setPeerId] = useState<string | undefined>();
-  const [connection, setConnection] = useState<DataConnection>();
+  const [connections, setConnections] = useState<Map<string, DataConnection>>(
+    new Map<string, DataConnection>()
+  );
   const [lastData, setLastData] = useState<GameState>();
 
   const createPeer = useCallback((id?: string) => {
@@ -21,41 +19,54 @@ export const PeerContextProvider = ({
   }, []);
 
   const connect = useCallback(
-    (id: string) => {
+    (id: string, label?: string) => {
       if (!peer) {
         return;
       }
 
-      setConnection(peer.connect(id));
+      const newConnection = peer.connect(id, { label });
+      setConnections((connections) =>
+        new Map(connections).set(newConnection.label, newConnection)
+      );
     },
     [peer]
   );
 
-  const send = useCallback((data: GameState) => {
-    if (!connection) {
-      throw new Error("connection is not set");
-    }
+  const send = useCallback(
+    (data: GameState, connectionLabel: string) => {
+      if (!connectionLabel) {
+        throw new Error("connection is not set");
+      }
 
-    if (!connected) {
-      throw new Error("connection is not open");
-    }
+      if (!connected) {
+        throw new Error("connection is not open");
+      }
 
-    connection.send(data);
-  }, [connected, connection]);
+      const connection = connections.get(connectionLabel);
+      if (!connection) {
+        throw new Error("connection is not set");
+      }
+
+      connection.send(data);
+    },
+    [connected, connections]
+  );
 
   const disconnect = useCallback(() => {
     if (!peer) {
       return;
     }
 
-    connection?.close();
     peer.disconnect();
     peer.destroy();
+    setConnections(new Map<string, DataConnection>());
+    setConnected(false);
     setPeer(undefined);
-  }, [connection, peer]);
+    setPeerId(undefined);
+  }, [peer]);
 
   useEffect(() => {
-    if (!connection) {
+    if (!connections?.size) {
       return;
     }
 
@@ -64,7 +75,6 @@ export const PeerContextProvider = ({
     };
 
     const disconnectedHandler = () => {
-      console.log("disconnect...");
       setConnected(false);
     };
 
@@ -74,7 +84,6 @@ export const PeerContextProvider = ({
 
     const errorHandler = (error: unknown) => {
       console.error(error);
-      setConnected(false);
     };
 
     const iceStateChangedHandler = (state: string) => {
@@ -82,20 +91,24 @@ export const PeerContextProvider = ({
       console.log("iceStateChangedHandler", state);
     };
 
-    connection.on("open", connectedHandler);
-    connection.on("close", disconnectedHandler);
-    connection.on("error", errorHandler);
-    connection.on("data", onDataHandler);
-    connection.on("iceStateChanged", iceStateChangedHandler);
+    for (const connection of connections.values()) {
+      connection.on("open", connectedHandler);
+      connection.on("close", disconnectedHandler);
+      connection.on("error", errorHandler);
+      connection.on("data", onDataHandler);
+      connection.on("iceStateChanged", iceStateChangedHandler);
+    }
 
     return () => {
-      connection.off("open", connectedHandler);
-      connection.off("close", disconnectedHandler);
-      connection.off("error", errorHandler);
-      connection.off("data", onDataHandler);
-      connection.off("iceStateChanged", iceStateChangedHandler);
+      for (const connection of connections.values()) {
+        connection.off("open", connectedHandler);
+        connection.off("close", disconnectedHandler);
+        connection.off("error", errorHandler);
+        connection.off("data", onDataHandler);
+        connection.off("iceStateChanged", iceStateChangedHandler);
+      }
     };
-  }, [connection]);
+  }, [connections]);
 
   useEffect(() => {
     if (!peer) {
@@ -106,9 +119,11 @@ export const PeerContextProvider = ({
       setPeerId(id);
     };
 
-    const connectedHandler = (conn: DataConnection) => {
+    const connectedHandler = (connection: DataConnection) => {
       setConnected(true);
-      setConnection(conn);
+      setConnections((connections) =>
+        new Map(connections).set(connection.label, connection)
+      );
     };
 
     const disconnectedHandler = () => {
