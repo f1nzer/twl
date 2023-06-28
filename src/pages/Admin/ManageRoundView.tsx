@@ -1,5 +1,5 @@
 import { Button, Grid, Stack } from "@mui/material";
-import { GameState } from "../../models/state";
+import { GameState, GameStatus } from "../../models/state";
 import { QuestionStorage } from "../../services/question-storage";
 import { usePeer } from "../../hooks/usePeer";
 
@@ -9,16 +9,19 @@ interface ManageRoundViewProps {
 
 const correctAnswer = (state: GameState) => {
   //TODO can be loaded from local storage
-  if (!state.round) {
+  const round = state.round;
+  if (!round) {
     return;
   }
-  const round = state.round;
 
-  if (round.currentPriceIndex >= round.priceValues.length - 1) {
-    round.bankTotal += round.priceValues[round.currentPriceIndex];
+  state.status = GameStatus.ROUND;
+
+  const lastPriceValueIndex = round.priceValues.length - 1;
+  if (round.currentPriceIndex >= lastPriceValueIndex) {
+    round.bankTotal += round.priceValues[lastPriceValueIndex];
     round.currentPriceIndex = 0;
   } else {
-    round.currentPriceIndex = ++round.currentPriceIndex;
+    round.currentPriceIndex += 1;
   }
 
   round.activePlayerIndex =
@@ -27,10 +30,12 @@ const correctAnswer = (state: GameState) => {
 };
 
 const incorrectAnswer = (state: GameState) => {
-  if (!state.round) {
+  const round = state.round;
+  if (!round) {
     return;
   }
-  const round = state.round;
+
+  state.status = GameStatus.ROUND;
   round.currentPriceIndex = 0;
   round.activePlayerIndex =
     (round.activePlayerIndex + 1) % round.activePlayersIndexes.length;
@@ -38,12 +43,18 @@ const incorrectAnswer = (state: GameState) => {
 };
 
 const saveBank = (state: GameState) => {
-  if (!state.round) {
+  const round = state.round;
+  if (!round) {
     return;
   }
-  const round = state.round;
 
-  round.bankTotal += round.priceValues[round.currentPriceIndex];
+  state.status = GameStatus.ROUND;
+
+  if (round.currentPriceIndex === 0) {
+    return;
+  }
+
+  round.bankTotal += round.priceValues[round.currentPriceIndex - 1];
   round.currentPriceIndex = 0;
 };
 
@@ -53,17 +64,17 @@ export const ManageRoundView = ({ state }: ManageRoundViewProps) => {
   const onCorrectAnswerClick = () => {
     correctAnswer(state);
     send(state);
-  }
+  };
 
   const onIncorrectAnswerClick = () => {
     incorrectAnswer(state);
     send(state);
-  }
+  };
 
   const onSaveBankClick = () => {
     saveBank(state);
     send(state);
-  }
+  };
 
   return (
     <Grid container spacing={2} height="100vh">

@@ -1,13 +1,13 @@
 import { useSearchParams } from "react-router-dom";
 import { GameState, GameStatus } from "../../models/state";
-import { Button, Typography } from "@mui/material";
 import { ManageRoundView } from "./ManageRoundView";
 import { usePeer } from "../../hooks/usePeer";
+import { useEffect } from "react";
 
 const gameState: GameState = {
   bankTotal: 10,
   players: [{ name: "КОНСТАНТИН" }, { name: "СЕМЁН" }, { name: "АЛЕКСЕЙ" }],
-  status: GameStatus.ROUND,
+  status: GameStatus.LOBBY,
   round: {
     activePlayerIndex: 0,
     activePlayersIndexes: [0, 1, 2],
@@ -21,21 +21,28 @@ const gameState: GameState = {
 
 export const AdminPage = () => {
   const [searchParams] = useSearchParams();
-  const { isConnected, connect, send } = usePeer();
+  const { isConnected, peerId, connect, send } = usePeer();
 
-  const sendState = () => {
-    send(gameState);
-  };
+  useEffect(() => {
+    if (!peerId || isConnected) {
+      return;
+    }
 
-  const connectToServer = () => {
     const gameId = searchParams.get("gameId");
     if (!gameId) {
-      alert("gameId is not set");
       return;
     }
 
     connect(gameId);
-  };
+  }, [connect, isConnected, peerId, searchParams]);
+
+  useEffect(() => {
+    if (!isConnected) {
+      return;
+    }
+
+    send(gameState);
+  }, [isConnected, send]);
 
   // TODO: add "new player" buttons
   // TODO: add "start game" button
@@ -49,17 +56,6 @@ export const AdminPage = () => {
 
   return (
     <>
-      <Typography>{gameState.bankTotal}</Typography>
-      <ul>
-        {!isConnected && (
-          <li>
-            <Button onClick={() => connectToServer()}>CONNECT</Button>
-          </li>
-        )}
-        <li>
-          <Button onClick={() => sendState()}>SEND STATE</Button>
-        </li>
-      </ul>
       <ManageRoundView state={gameState} />
     </>
   );

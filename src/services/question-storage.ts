@@ -8,12 +8,12 @@ const questionList: string[] = [
 ];
 
 let lastQuestionIndex: number;
-let alreadyUsedIndex: string[number];
+// let alreadyUsedIndex: string[number];
 
 export const QuestionStorage = {
-  loadQuestions: (data: any) => {
-    return false;
-  },
+//   loadQuestions: (data: any) => {
+//     return false;
+//   },
   getNext: () => {
     if (!questionList) {
       return "сам придумывай себе вопросы, пес!";

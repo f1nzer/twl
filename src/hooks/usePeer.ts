@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo } from "react";
+import { useContext, useEffect } from "react";
 import { IPeerContext, PeerContext } from "../contexts/PeerContext";
 import { GameState } from "../models/state";
 
@@ -27,6 +27,7 @@ export const usePeer = (): IUsePeer => {
     return () => {
       context.disconnect();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [context.isConnected]);
 
   return {
