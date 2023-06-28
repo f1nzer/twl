@@ -1,19 +1,31 @@
 import { useSearchParams } from "react-router-dom";
-import { GameStatus } from "../../models/state";
+import { GameState, GameStatus } from "../../models/state";
 import { PeerState } from "../../services/peer-service";
 import { useState } from "react";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
+import { ManageRoundView } from "./ManageRoundView";
+
+let gameState : GameState = {
+  bankTotal: 10,
+  players: [{ name: "КОНСТАНТИН" }, { name: "СЕМЁН" }, { name: "АЛЕКСЕЙ" }],
+  status: GameStatus.ROUND,
+  round: {
+    activePlayerIndex: 0,
+    activePlayersIndexes: [0,1,2],
+    priceValues: [1000, 2000, 3000, 4000, 5000],
+    currentPriceIndex: 0,
+    roundDuration: 70 + 30,
+    bankTotal: 0,
+    activeQuestionText: "Какой ты сегодня?"
+  }
+}
 
 export const AdminPage = () => {
   const [searchParams] = useSearchParams();
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
   const sendState = () => {
-    PeerState.send({
-      bankTotal: 10,
-      players: [{ name: "КОНСТАНТИН" }, { name: "СЕМЁН" }, { name: "АЛЕКСЕЙ" }],
-      status: GameStatus.LOBBY,
-    });
+    PeerState.send(gameState);
   };
 
   const connect = () => {
@@ -41,6 +53,7 @@ export const AdminPage = () => {
 
   return (
     <>
+    <Typography>{gameState.bankTotal}</Typography>
       <ul>
         {!isConnected && (
           <li>
@@ -51,6 +64,7 @@ export const AdminPage = () => {
           <Button onClick={() => sendState()}>SEND STATE</Button>
         </li>
       </ul>
+      <ManageRoundView state={gameState} />
     </>
   );
 };
