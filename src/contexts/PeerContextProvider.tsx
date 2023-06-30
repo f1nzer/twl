@@ -134,6 +134,7 @@ export const PeerContextProvider = ({
 
     const openHandler = (id: string) => {
       setPeerId(id);
+      sessionStorage.setItem("peerId", id);
     };
 
     const connectedHandler = (connection: DataConnection) => {
@@ -146,11 +147,18 @@ export const PeerContextProvider = ({
     };
 
     const disconnectedHandler = () => {
-      peer.reconnect();
+      if (!peer.destroyed) {
+        peer.reconnect();
+      }
     };
 
     const errorHandler = (error: unknown) => {
-      console.error(error);
+      const { type: errorType } = error as { type: string };
+      if (errorType === "unavailable-id") {
+        disconnect();
+      } else {
+        console.error(error);
+      }
     };
 
     peer.on("open", openHandler);
@@ -164,7 +172,7 @@ export const PeerContextProvider = ({
       peer.off("connection", connectedHandler);
       peer.off("disconnected", disconnectedHandler);
     };
-  }, [peer]);
+  }, [disconnect, peer]);
 
   // initialize peer
   useEffect(() => {
@@ -172,7 +180,8 @@ export const PeerContextProvider = ({
       return;
     }
 
-    setPeer(new Peer());
+    const sessionPeerId = sessionStorage.getItem("peerId");
+    setPeer(sessionPeerId ? new Peer(sessionPeerId) : new Peer());
 
     return () => {
       disconnect();
