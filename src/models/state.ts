@@ -4,6 +4,7 @@ export interface GameState {
   bankTotal: number;
 
   round?: RoundState; // null only for LOBBY status
+  roundIndex: number;
 }
 
 export enum GameStatus {
@@ -14,6 +15,14 @@ export enum GameStatus {
 
 export interface Player {
   name: string;
+  statistics?: PlayerRoundStatistics[];
+}
+
+export interface PlayerRoundStatistics {
+  roundIndex: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  totalQuestionValuePrice: number;
 }
 
 export interface RoundState {
@@ -22,6 +31,8 @@ export interface RoundState {
 
   // who plays the round
   activePlayersIndexes: number[]; // [0, 2, 4]
+
+  startTimerDate: number;
 
   roundDuration: number; // in seconds
 

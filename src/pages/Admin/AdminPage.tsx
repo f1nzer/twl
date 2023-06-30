@@ -1,28 +1,22 @@
 import { useSearchParams } from "react-router-dom";
 import { GameState, GameStatus } from "../../models/state";
-import { ManageRoundView } from "./ManageRoundView";
 import { usePeer } from "../../hooks/usePeer";
 import { useEffect } from "react";
 import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
+import { GameView } from "./GameView";
+import { CircularProgress, Grid } from "@mui/material";
 
 const gameState: GameState = {
-  bankTotal: 10,
+  bankTotal: 0,
   players: [{ name: "КОНСТАНТИН" }, { name: "СЕМЁН" }, { name: "АЛЕКСЕЙ" }],
   status: GameStatus.LOBBY,
-  round: {
-    activePlayerIndex: 0,
-    activePlayersIndexes: [0, 1, 2],
-    priceValues: [1000, 2000, 3000, 4000, 5000],
-    currentPriceIndex: 0,
-    roundDuration: 70 + 30,
-    bankTotal: 0,
-    activeQuestionText: "Какой ты сегодня?",
-  },
+  roundIndex: 0
 };
 
 export const AdminPage = () => {
   const [searchParams] = useSearchParams();
   const { isConnected, peerId, connect, send } = usePeer();
+  const size = 256;
 
   useEffect(() => {
     if (!peerId || isConnected) {
@@ -56,8 +50,20 @@ export const AdminPage = () => {
   // TODO: debug button to RESET state to start from the beginning
 
   return (
-    <>
-      <ManageRoundView state={gameState} />
-    </>
+    <Grid container spacing={2} height="100vh">
+      <Grid
+        item
+        xs={12}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        {isConnected ? (
+          <GameView state={gameState} />
+        ) : (
+          <CircularProgress size={size} />
+        )}
+      </Grid>
+    </Grid >
   );
 };
