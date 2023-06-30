@@ -1,29 +1,46 @@
-import { useContext, useEffect, useMemo } from "react";
-import { IPeerContext, PeerContext } from "../contexts/PeerContext";
+import { useCallback, useMemo } from "react";
+import { usePeerContext } from "./usePeerContext";
+import { NetworkMessage } from "../models/networking";
+import { DataConnection } from "peerjs";
 
-export const usePeer = (): IPeerContext => {
-  const context = useContext(PeerContext) as IPeerContext;
+interface UsePeerConnectionData {
+  isConnected: boolean;
+  lastMessage?: NetworkMessage;
+  connection?: DataConnection;
+  peerId?: string;
+  connect: (peerId: string) => void;
+  send: (message: NetworkMessage) => void;
+}
 
-  const hasConnections = useMemo(() => {
-    if (!context) {
-      return false;
-    }
+export const usePeerConnection = (connectionLabel: string): UsePeerConnectionData => {
+  const { isConnected, lastMessages, connections, connect, send, peerId } = usePeerContext();
 
-    return context.connections.size > 0;
-  }, [context.connections]);
+  const isConnectionEstablished = useMemo(() => {
+    return !!isConnected.get(connectionLabel);
+  }, [connectionLabel, isConnected]);
 
-  useEffect(() => {
-    if (hasConnections) {
-      return;
-    }
+  const lastMessage = useMemo(() => {
+    return lastMessages.get(connectionLabel);
+  }, [connectionLabel, lastMessages]);
 
-    context.createPeer();
+  const connection = useMemo(() => {
+    return connections.get(connectionLabel);
+  }, [connectionLabel, connections]);
 
-    return () => {
-      context.disconnect();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasConnections]);
+  const connectFunc = useCallback((peerId: string) => {
+    return connect(peerId, connectionLabel);
+  }, [connectionLabel, connect]);
 
-  return context;
+  const sendFunc = useCallback((message: NetworkMessage) => {
+    return send(message, connectionLabel);
+  }, [connectionLabel, send]);
+
+  return {
+    isConnected: isConnectionEstablished,
+    lastMessage,
+    connection,
+    peerId,
+    connect: connectFunc,
+    send: sendFunc,
+  };
 };

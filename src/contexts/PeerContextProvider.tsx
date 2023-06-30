@@ -7,20 +7,17 @@ export const PeerContextProvider = ({
   children,
 }: React.PropsWithChildren<unknown>) => {
   const [peer, setPeer] = useState<Peer>();
+  const [peerId, setPeerId] = useState<string>();
+
   const [connected, setConnected] = useState<Map<string, boolean>>(
     new Map<string, boolean>()
   );
-  const [peerId, setPeerId] = useState<string | undefined>();
   const [connections, setConnections] = useState<Map<string, DataConnection>>(
     new Map<string, DataConnection>()
   );
   const [lastMessages, setLastMessages] = useState<Map<string, NetworkMessage>>(
     new Map<string, NetworkMessage>()
   );
-
-  const createPeer = useCallback((id?: string) => {
-    setPeer(id ? new Peer(id) : new Peer());
-  }, []);
 
   const connect = useCallback(
     (id: string, label?: string) => {
@@ -39,17 +36,16 @@ export const PeerContextProvider = ({
   const send = useCallback(
     (data: NetworkMessage, connectionLabel: string) => {
       if (!connectionLabel) {
-        throw new Error("connection is not set");
+        throw new Error(`connection label is not set: ${connectionLabel}`);
       }
 
       if (!connected.get(connectionLabel)) {
-        console.warn("connection is not open");
-        return;
+        throw new Error(`connection is not open: ${connectionLabel}`);
       }
 
       const connection = connections.get(connectionLabel);
       if (!connection) {
-        throw new Error("connection is not set");
+        throw new Error(`connection was not created: ${connectionLabel}`);
       }
 
       console.log("SENDING DATA", data);
@@ -81,7 +77,17 @@ export const PeerContextProvider = ({
     }
 
     function disconnectedHandler(this: DataConnection) {
-      setConnected((connected) => new Map(connected).set(this.label, false));
+      setConnected((connected) => {
+        const newMap = new Map(connected);
+        newMap.delete(this.label);
+        return newMap;
+      });
+
+      setConnections((connections) => {
+        const newMap = new Map(connections);
+        newMap.delete(this.label);
+        return newMap;
+      });
     }
 
     function onDataHandler(this: DataConnection, data: unknown) {
@@ -127,12 +133,13 @@ export const PeerContextProvider = ({
     }
 
     const openHandler = (id: string) => {
-      console.log("PEER ID CHANGED", id);
       setPeerId(id);
     };
 
     const connectedHandler = (connection: DataConnection) => {
-      setConnected((connected) => new Map(connected).set(connection.label, true));
+      setConnected((connected) =>
+        new Map(connected).set(connection.label, true)
+      );
       setConnections((connections) =>
         new Map(connections).set(connection.label, connection)
       );
@@ -159,14 +166,27 @@ export const PeerContextProvider = ({
     };
   }, [peer]);
 
+  // initialize peer
+  useEffect(() => {
+    if (peer) {
+      return;
+    }
+
+    setPeer(new Peer());
+
+    return () => {
+      disconnect();
+    };
+  }, [disconnect, peer]);
+
   return (
     <PeerContext.Provider
       value={{
-        createPeer,
         send,
         connect,
         disconnect,
         isConnected: connected,
+        peer,
         peerId,
         lastMessages,
         connections,

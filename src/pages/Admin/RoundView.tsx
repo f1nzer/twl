@@ -10,6 +10,10 @@ interface RoundViewProps {
 }
 
 export const RoundView = ({ state, onUpdateState }: RoundViewProps) => {
+  const round = state.round;
+  if (!round) {
+    return;
+  }
 
   const onCorrectAnswerClick = () => {
     const newState = RoundService.applyCorrectAnswer(state);
@@ -32,11 +36,11 @@ export const RoundView = ({ state, onUpdateState }: RoundViewProps) => {
 
   return (
     <Stack direction="column" spacing={4}>
-      <Timer seconds={state.round!.roundDuration} />
-      <PlayerView player={filteredPlayers[state.round!.activePlayerIndex]} />
+      <Timer seconds={round.roundDuration} />
+      <PlayerView player={filteredPlayers[round.activePlayerIndex]} />
 
       <Typography variant="h3" textAlign="center">
-        {state.round!.activeQuestionText}
+        {round.activeQuestionText}
       </Typography>
 
       <Stack direction="row" spacing={2}>

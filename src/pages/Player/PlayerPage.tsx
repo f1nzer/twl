@@ -1,21 +1,19 @@
 import { useSearchParams } from "react-router-dom";
-import { usePeer } from "../../hooks/usePeer";
 import { useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
-import { NetworkMessageType } from "../../models/networking";
+import { NetworkMessageType, PlayerMessage } from "../../models/networking";
 import { PlayerNameForm } from "./PlayerNameForm";
 import { usePlayerState } from "./hooks/usePlayerState";
-import { usePeerConnection } from "../../hooks/usePeerConnection";
+import { usePeerConnection } from "../../hooks/usePeer";
 
 export const PlayerPage = () => {
   const [searchParams] = useSearchParams();
-  const [playerName, setPlayerName] = useState<string>("");
-  const { connect, send } = usePeer();
+  const [playerMessage, setPlayerMessage] = useState<PlayerMessage>();
   const { connectionLabel, gameState } = usePlayerState();
-  const { isConnected } = usePeerConnection(connectionLabel);
+  const { connect, send, isConnected } = usePeerConnection(connectionLabel);
 
   useEffect(() => {
-    if (!connectionLabel || isConnected) {
+    if (isConnected) {
       return;
     }
 
@@ -24,31 +22,38 @@ export const PlayerPage = () => {
       return;
     }
 
-    connect(adminPeerId, connectionLabel);
-  }, [connect, isConnected, connectionLabel, searchParams]);
+    connect(adminPeerId);
+  }, [connect, isConnected, searchParams]);
 
   useEffect(() => {
-    if (!connectionLabel || !playerName || !isConnected) {
+    if (!isConnected || !playerMessage) {
       return;
     }
 
     send({
       type: NetworkMessageType.PLAYER_MESSAGE,
-      data: {
-        name: playerName
-      }
-    }, connectionLabel);
-  }, [connectionLabel, playerName]);
+      data: playerMessage,
+    });
+  }, [isConnected, playerMessage, send]);
 
   if (!isConnected) {
-    return <CircularProgress size={512} />
+    return <CircularProgress size={512} />;
   }
 
-  if (!playerName) {
+  if (!playerMessage || !playerMessage.name) {
     return (
-      <PlayerNameForm onSubmit={(name) => setPlayerName(name)} />
+      <PlayerNameForm
+        onSubmit={(name) =>
+          setPlayerMessage((msg) => {
+            return {
+              ...msg,
+              name,
+            };
+          })
+        }
+      />
     );
   }
 
   return <>GAME STATE: {gameState?.status ?? "NO DATA"}</>;
-}
+};

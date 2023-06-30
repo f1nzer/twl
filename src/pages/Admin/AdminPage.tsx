@@ -1,15 +1,15 @@
 import { useSearchParams } from "react-router-dom";
-import { usePeer } from "../../hooks/usePeer";
 import { useEffect } from "react";
 import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
 import { GameView } from "./GameView";
 import { CircularProgress, Grid } from "@mui/material";
-import { usePeerConnection } from "../../hooks/usePeerConnection";
+import { usePeerConnection } from "../../hooks/usePeer";
 
 export const AdminPage = () => {
   const [searchParams] = useSearchParams();
-  const { peerId, connect } = usePeer();
-  const { isConnected } = usePeerConnection(ADMIN_CONNECTION_LABEL);
+  const { connect, isConnected, peerId } = usePeerConnection(
+    ADMIN_CONNECTION_LABEL
+  );
 
   const size = 256;
 
@@ -23,17 +23,11 @@ export const AdminPage = () => {
       return;
     }
 
-    connect(gameId, ADMIN_CONNECTION_LABEL);
+    connect(gameId);
   }, [connect, isConnected, peerId, searchParams]);
 
-  // TODO: add "new player" buttons
-  // TODO: add "start game" button
-  // TODO: timer for the round
-  // TODO: 3 buttons CORRECT, INCORRECT, BANK
-  // TODO: on timer end, send GAME STATUS VOTE (but let the player to answer last question)
   // TODO: add button to remove a player
   // TODO: start new round without the removed player
-
   // TODO: debug button to RESET state to start from the beginning
 
   return (
@@ -45,12 +39,8 @@ export const AdminPage = () => {
         alignItems="center"
         justifyContent="center"
       >
-        {isConnected ? (
-          <GameView />
-        ) : (
-          <CircularProgress size={size} />
-        )}
+        {isConnected ? <GameView /> : <CircularProgress size={size} />}
       </Grid>
-    </Grid >
+    </Grid>
   );
 };

@@ -11,3 +11,9 @@ export interface NetworkMessage {
   type: NetworkMessageType;
   data: GameState | PlayerMessage;
 }
+
+export interface PlayerMessage {
+  name: string;
+  votePlayerLabel?: string;
+}
+

@@ -32,7 +32,7 @@ export const RoundService = {
       return newState;
     }
 
-    newState.status = getNewStatus(newState.round!);
+    newState.status = getNewStatus(round);
     if (round.currentPriceIndex === 0) {
       return newState;
     }
@@ -56,7 +56,7 @@ export const RoundService = {
       return newState;
     }
 
-    newState.status = getNewStatus(newState.round!);
+    newState.status = getNewStatus(round);
     round.currentPriceIndex = 0;
     round.activePlayerIndex =
       (round.activePlayerIndex + 1) % round.activePlayersIndexes.length;
@@ -85,7 +85,7 @@ export const RoundService = {
       return newState;
     }
 
-    newState.status = getNewStatus(newState.round!);
+    newState.status = getNewStatus(round);
 
     round.currentPriceIndex += 1;
     round.activePlayerIndex =

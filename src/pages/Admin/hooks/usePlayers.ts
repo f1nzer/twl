@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Player } from "../../../models/state";
-import { usePeer } from "../../../hooks/usePeer";
+import { usePeerContext } from "../../../hooks/usePeerContext";
 import { NetworkMessage, NetworkMessageType } from "../../../models/networking";
 
 interface UsePlayersData {
@@ -9,7 +9,7 @@ interface UsePlayersData {
 
 export const usePlayers = (): UsePlayersData => {
   const [players, setPlayers] = useState<Player[]>([]);
-  const { lastMessages } = usePeer();
+  const { lastMessages } = usePeerContext();
 
   useEffect(() => {
     setPlayers((players) => {

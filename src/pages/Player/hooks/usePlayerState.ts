@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { usePeer } from "../../../hooks/usePeer";
+import { usePeerContext } from "../../../hooks/usePeerContext";
 import { GameState } from "../../../models/state";
 import { NetworkMessageType } from "../../../models/networking";
 
@@ -10,7 +10,7 @@ interface UsePlayerStateData {
 
 export const usePlayerState = (): UsePlayerStateData => {
   const [connectionLabel, setConnectionLabel] = useState<string>("");
-  const { peerId, lastMessages } = usePeer();
+  const { peerId, lastMessages } = usePeerContext();
   const [gameState, setGameState] = useState<GameState>();
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export const usePlayerState = (): UsePlayerStateData => {
     if (msg && msg.type === NetworkMessageType.GAME_STATE) {
       setGameState(msg.data as GameState);
     }
-  }, [lastMessages]);
+  }, [connectionLabel, lastMessages]);
 
   return {
     connectionLabel,
