@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import { RoundService } from "../../services/RoundService";
 import { usePlayers } from "./hooks/usePlayers";
 import { PlayersView } from "../Game/PlayersView";
-import { usePeerConnection } from "../../hooks/usePeer";
+import { usePeerConnection } from "../../hooks/usePeerConnection";
 
 export const GameView = () => {
   const { connections, send: sendTo } = usePeerContext();

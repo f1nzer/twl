@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
 import { GameView } from "./GameView";
 import { CircularProgress, Grid } from "@mui/material";
-import { usePeerConnection } from "../../hooks/usePeer";
+import { usePeerConnection } from "../../hooks/usePeerConnection";
 
 export const AdminPage = () => {
   const [searchParams] = useSearchParams();

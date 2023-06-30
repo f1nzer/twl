@@ -4,7 +4,7 @@ import { AdminConnectionView } from "./AdminConnectionView";
 import { GameState, GameStatus } from "../../models/state";
 import { VoteView } from "./VoteView";
 import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
-import { usePeerConnection } from "../../hooks/usePeer";
+import { usePeerConnection } from "../../hooks/usePeerConnection";
 import { CircularProgress } from "@mui/material";
 
 export const GamePage = () => {

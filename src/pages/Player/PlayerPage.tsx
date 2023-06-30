@@ -4,7 +4,7 @@ import { CircularProgress } from "@mui/material";
 import { NetworkMessageType, PlayerMessage } from "../../models/networking";
 import { PlayerNameForm } from "./PlayerNameForm";
 import { usePlayerState } from "./hooks/usePlayerState";
-import { usePeerConnection } from "../../hooks/usePeer";
+import { usePeerConnection } from "../../hooks/usePeerConnection";
 
 export const PlayerPage = () => {
   const [searchParams] = useSearchParams();
