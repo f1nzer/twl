@@ -1,21 +1,16 @@
 import { useSearchParams } from "react-router-dom";
-import { GameState, GameStatus } from "../../models/state";
 import { usePeer } from "../../hooks/usePeer";
 import { useEffect } from "react";
 import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
 import { GameView } from "./GameView";
 import { CircularProgress, Grid } from "@mui/material";
-
-const gameState: GameState = {
-  bankTotal: 0,
-  players: [{ name: "КОНСТАНТИН" }, { name: "СЕМЁН" }, { name: "АЛЕКСЕЙ" }],
-  status: GameStatus.LOBBY,
-  roundIndex: 0
-};
+import { usePeerConnection } from "../../hooks/usePeerConnection";
 
 export const AdminPage = () => {
   const [searchParams] = useSearchParams();
-  const { isConnected, peerId, connect, send } = usePeer();
+  const { peerId, connect } = usePeer();
+  const { isConnected } = usePeerConnection(ADMIN_CONNECTION_LABEL);
+
   const size = 256;
 
   useEffect(() => {
@@ -30,14 +25,6 @@ export const AdminPage = () => {
 
     connect(gameId, ADMIN_CONNECTION_LABEL);
   }, [connect, isConnected, peerId, searchParams]);
-
-  useEffect(() => {
-    if (!isConnected) {
-      return;
-    }
-
-    send(gameState, ADMIN_CONNECTION_LABEL);
-  }, [isConnected, send]);
 
   // TODO: add "new player" buttons
   // TODO: add "start game" button
@@ -59,7 +46,7 @@ export const AdminPage = () => {
         justifyContent="center"
       >
         {isConnected ? (
-          <GameView state={gameState} />
+          <GameView />
         ) : (
           <CircularProgress size={size} />
         )}

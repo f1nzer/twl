@@ -1,106 +1,129 @@
-import { Button } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import { usePeer } from "../../hooks/usePeer";
-import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
-import { GameState, GameStatus } from "../../models/state";
-import { QuestionStorage } from "../../services/question-storage";
+import { ADMIN_CONNECTION_LABEL, NetworkMessageType } from "../../models/networking";
+import { GameState, GameStatus, Player } from "../../models/state";
 import { RoundView } from "./RoundView";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { RoundService } from "../../services/RoundService";
+import { usePlayers } from "./hooks/usePlayers";
+import { PlayersView } from "../Game/PlayersView";
+import { usePeerConnection } from "../../hooks/usePeerConnection";
 
-interface GameViewProps {
-    state: GameState;
-}
 
-const defaultPiceValues: number[] = [1000, 2000, 3000, 4000, 5000, 10000];
+export const GameView = () => {
+  const { connections, send } = usePeer();
+  const { isConnected } = usePeerConnection(ADMIN_CONNECTION_LABEL);
+  const { players } = usePlayers();
+  const [gameState, setGameState] = useState<GameState>({
+    bankTotal: 0,
+    players: [],
+    status: GameStatus.LOBBY,
+    roundIndex: 0
+  });
 
-export const GameView = ({ state }: GameViewProps) => {
-    const { isConnected, send } = usePeer();
-    const [gameState, setGameState] = useState<GameState>(state);
+  const activeGameStatus = useMemo(() => {
+    return gameState.status;
+  }, [gameState]);
 
-    useEffect(() => {
-        console.log('rerender component');
-        if (!isConnected) {
-            return;
-        }
-
-        send(gameState, ADMIN_CONNECTION_LABEL);
-
-        return () => { console.log("disposing...") }
-    }, [gameState]);
-
-    const onGameStartClick = () => {
-        const activePlayersIndexes = [...Array(state.players.length).keys()];
-        const newState = createNewRoundState(activePlayersIndexes);
-
-        setGameState(newState);
+  useEffect(() => {
+    if (!isConnected) {
+      return;
     }
 
-    const createNewRoundState = (activePlayerIndexes: number[]): GameState => {
-        const newState: GameState = {
-            ...gameState,
-            status: GameStatus.ROUND,
-            roundIndex: gameState.roundIndex + 1,
-            round: {
-                activePlayerIndex: 0, //TODO start from the MVP player
-                activePlayersIndexes: activePlayerIndexes,
-                activeQuestionText: QuestionStorage.getNext(),
-                priceValues: defaultPiceValues,
-                currentPriceIndex: 0,
-                bankTotal: 0,
-                startTimerDate: Date.now(),
-                roundDuration: 10 + activePlayerIndexes.length * 1,
-            }
-        };
+    connections.forEach((connection) => {
+      send({
+        type: NetworkMessageType.GAME_STATE,
+        data: gameState
+      }, connection.label)
+    });
+  }, [activeGameStatus]);
 
-        return newState;
+  useEffect(() => {
+    if (!isConnected) {
+      return;
     }
 
-    const onRoundStartClick = () => {
+    send({
+      type: NetworkMessageType.GAME_STATE,
+      data: gameState
+    }, ADMIN_CONNECTION_LABEL);
+  }, [gameState]);
 
-        //TODO filter by removed player
-        const activePlayersIndexes = [...Array(state.players.length).keys()];
-        const newState = createNewRoundState(activePlayersIndexes);
+  useEffect(() => {
+    setGameState({ ...gameState, players: players });
+  }, [players]);
 
-        setGameState(newState);
+  const onGameStartClick = () => {
+    const activePlayersIndexes = [...Array(gameState.players.length).keys()];
+    const newState = RoundService.createNewRoundState(gameState, activePlayersIndexes);
+
+    setGameState(newState);
+  }
+
+  const onRoundStartClick = () => {
+    //TODO filter by removed player
+    const activePlayersIndexes = [...Array(gameState.players.length).keys()];
+    const newState = RoundService.createNewRoundState(gameState, activePlayersIndexes);
+
+    setGameState(newState);
+  }
+
+  const onUpdateState = (state: GameState) => {
+    if (state.round && gameState.status === GameStatus.ROUND && state.status === GameStatus.VOTE) {
+      state.bankTotal += state.round.bankTotal;
     }
 
-    const onUpdateState = (state: GameState) => {
-        if (state.round && gameState.status === GameStatus.ROUND && state.status === GameStatus.VOTE) {
-            state.bankTotal += state.round.bankTotal;
-        }
+    setGameState(state);
+  }
 
-        setGameState(state);
-    }
+  const activePlayers: Player[] = gameState.players.filter((_player, index) => gameState.round?.activePlayersIndexes.includes(index));
 
-    if (gameState.status === GameStatus.LOBBY) {
-        return (
+  if (gameState.status === GameStatus.LOBBY) {
+    return (
+      <>
+        <Grid>
+          <PlayersView players={gameState.players} />
+          <Box textAlign={"center"}>
             <Button
-                size="large"
-                variant="contained"
-                color="success"
-                onClick={() => onGameStartClick()}
+              size="large"
+              variant="contained"
+              color="success"
+              disabled={gameState.players.length <= 1}
+              onClick={() => onGameStartClick()}
             >
-                НАЧАТЬ ИГРУ
+              НАЧАТЬ ИГРУ
             </Button>
-        );
-    }
+          </Box>
+        </Grid >
+      </>
+    );
+  }
 
-    if (gameState.status === GameStatus.VOTE) {
-        return (
+  if (gameState.status === GameStatus.VOTE) {
+    return (
+      <>
+        <Grid>
+          <PlayersView players={activePlayers} />
+          <Box textAlign={"center"}>
             <Button
-                size="large"
-                variant="contained"
-                color="success"
-                onClick={() => onRoundStartClick()}
+              sx={{ width: 200 }}
+              size="large"
+              variant="contained"
+              color="success"
+              onClick={() => onRoundStartClick()}
             >
-                НАЧАТЬ РАУНД
+              НАЧАТЬ РАУНД
             </Button>
-        );
-    }
+          </Box>
+        </Grid >
+      </>
+    );
+  }
 
-    if (gameState.status == GameStatus.ROUND) {
-        return <RoundView state={gameState} onUpdateState={onUpdateState} />;
-    }
+  if (gameState.status == GameStatus.ROUND) {
+    return <RoundView state={gameState} onUpdateState={onUpdateState} />;
+  }
 
-    return "UNKNOWN STATE";
+  return "UNKNOWN STATE";
 };
 

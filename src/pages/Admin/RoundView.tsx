@@ -1,108 +1,28 @@
 import { Button, Stack, Typography } from "@mui/material";
-import { GameState, GameStatus, RoundState } from "../../models/state";
-import { QuestionStorage } from "../../services/question-storage";
+import { GameState } from "../../models/state";
 import { PlayerView } from "../Game/PlayersView";
 import { Timer } from "../Game/Timer";
+import { RoundService } from "../../services/RoundService";
 
 interface RoundViewProps {
   state: GameState;
   onUpdateState: (state: GameState) => void;
 }
 
-const applyCorrectAnswer = (state: GameState) => {
-  //TODO can be loaded from local storage
-  const newState: GameState = { ...state };
-  const round = newState.round;
-  if (!round) {
-    return newState;
-  }
-
-  const maxBankValue = round.priceValues[round.priceValues.length - 1];
-  const nextPotentialBankValue = round.bankTotal + round.priceValues[round.currentPriceIndex];
-  const isBankLimitReached = nextPotentialBankValue >= maxBankValue;
-
-  const maxPriceValueIndex = round.priceValues.length - 1;
-  const isPriceIndexEndReached = round.currentPriceIndex >= maxPriceValueIndex;
-
-  if (isBankLimitReached || isPriceIndexEndReached) {
-    newState.status = GameStatus.VOTE;
-    round.bankTotal = maxBankValue;
-    return newState;
-  }
-
-  newState.status = getNewStatus(newState.round!);
-
-  round.currentPriceIndex += 1;
-  round.activePlayerIndex =
-    (round.activePlayerIndex + 1) % round.activePlayersIndexes.length;
-  round.activeQuestionText = QuestionStorage.getNext();
-  return newState;
-};
-
-const applyIncorrectAnswer = (state: GameState) => {
-  const newState: GameState = { ...state };
-  const round = newState.round;
-  if (!round) {
-    return newState;
-  }
-
-  newState.status = getNewStatus(newState.round!);
-  round.currentPriceIndex = 0;
-  round.activePlayerIndex =
-    (round.activePlayerIndex + 1) % round.activePlayersIndexes.length;
-  round.activeQuestionText = QuestionStorage.getNext();
-  return newState;
-};
-
-const saveBank = (state: GameState) => {
-  const newState: GameState = { ...state };
-  const round = newState.round;
-  if (!round) {
-    return newState;
-  }
-
-  newState.status = getNewStatus(newState.round!);
-  if (round.currentPriceIndex === 0) {
-    return newState;
-  }
-
-  round.bankTotal += round.priceValues[round.currentPriceIndex - 1];
-
-  const maxBankValue = round.priceValues[round.priceValues.length - 1];
-  if (round.bankTotal >= maxBankValue) {
-    newState.status = GameStatus.VOTE;
-    round.bankTotal = maxBankValue;
-  }
-
-  round.currentPriceIndex = 0;
-  return newState;
-};
-
-const getNewStatus = (round: RoundState): GameStatus => {
-  return isRoundExpired(round) ? GameStatus.VOTE : GameStatus.ROUND;
-}
-
-const isRoundExpired = (round: RoundState) => {
-  const nowDate = new Date();
-  const startTimerDate = new Date(round.startTimerDate);
-
-  return (nowDate.getTime() - startTimerDate.getTime()) / 1000 > round.roundDuration;
-};
-
 export const RoundView = ({ state, onUpdateState }: RoundViewProps) => {
 
   const onCorrectAnswerClick = () => {
-    var newState = applyCorrectAnswer(state);
+    const newState = RoundService.applyCorrectAnswer(state);
     onUpdateState(newState);
   };
 
   const onIncorrectAnswerClick = () => {
-    const newState = applyIncorrectAnswer(state);
+    const newState = RoundService.applyIncorrectAnswer(state);
     onUpdateState(newState);
   };
 
   const onSaveBankClick = () => {
-    const newState = saveBank(state);
+    const newState = RoundService.saveBank(state);
     onUpdateState(newState);
   };
 
@@ -112,6 +32,7 @@ export const RoundView = ({ state, onUpdateState }: RoundViewProps) => {
 
   return (
     <Stack direction="column" spacing={4}>
+      <Timer seconds={state.round!.roundDuration} />
       <PlayerView player={filteredPlayers[state.round!.activePlayerIndex]} />
 
       <Typography variant="h3" textAlign="center">

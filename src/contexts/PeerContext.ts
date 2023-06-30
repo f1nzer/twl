@@ -1,15 +1,18 @@
 import { createContext } from "react";
-import { GameState } from "../models/state";
+import { DataConnection } from "peerjs";
+import { NetworkMessage } from "../models/networking";
 
 export interface IPeerContext {
   createPeer: (id?: string) => void;
-  send: (data: GameState, connectionLabel: string) => void;
+  send: (data: NetworkMessage, connectionLabel: string) => void;
   connect: (id: string, label?: string) => void;
   disconnect: () => void;
 
-  isConnected: boolean;
   peerId?: string;
-  lastData?: GameState;
+
+  connections: Map<string, DataConnection>;
+  isConnected: Map<string, boolean>;
+  lastMessages: Map<string, NetworkMessage>;
 }
 
 export const PeerContext = createContext<IPeerContext | undefined>(undefined);

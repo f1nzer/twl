@@ -8,13 +8,16 @@ export interface GameState {
 }
 
 export enum GameStatus {
-  LOBBY,
-  ROUND,
-  VOTE,
+  LOBBY = 'LOBBY',
+  ROUND = 'ROUND',
+  VOTE = 'VOTE',
 }
 
 export interface Player {
   name: string;
+  connectionLabel: string;
+  votePlayerLabel?: string;
+
   statistics?: PlayerRoundStatistics[];
 }
 

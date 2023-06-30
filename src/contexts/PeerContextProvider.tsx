@@ -1,18 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 import { PeerContext } from "./PeerContext";
 import Peer, { DataConnection } from "peerjs";
-import { GameState } from "../models/state";
+import { NetworkMessage } from "../models/networking";
 
 export const PeerContextProvider = ({
   children,
 }: React.PropsWithChildren<unknown>) => {
   const [peer, setPeer] = useState<Peer>();
-  const [connected, setConnected] = useState<boolean>(false);
+  const [connected, setConnected] = useState<Map<string, boolean>>(
+    new Map<string, boolean>()
+  );
   const [peerId, setPeerId] = useState<string | undefined>();
   const [connections, setConnections] = useState<Map<string, DataConnection>>(
     new Map<string, DataConnection>()
   );
-  const [lastData, setLastData] = useState<GameState>();
+  const [lastMessages, setLastMessages] = useState<Map<string, NetworkMessage>>(
+    new Map<string, NetworkMessage>()
+  );
 
   const createPeer = useCallback((id?: string) => {
     setPeer(id ? new Peer(id) : new Peer());
@@ -33,13 +37,14 @@ export const PeerContextProvider = ({
   );
 
   const send = useCallback(
-    (data: GameState, connectionLabel: string) => {
+    (data: NetworkMessage, connectionLabel: string) => {
       if (!connectionLabel) {
         throw new Error("connection is not set");
       }
 
-      if (!connected) {
-        throw new Error("connection is not open");
+      if (!connected.get(connectionLabel)) {
+        console.warn("connection is not open");
+        return;
       }
 
       const connection = connections.get(connectionLabel);
@@ -47,6 +52,7 @@ export const PeerContextProvider = ({
         throw new Error("connection is not set");
       }
 
+      console.log("SENDING DATA", data);
       connection.send(data);
     },
     [connected, connections]
@@ -60,7 +66,7 @@ export const PeerContextProvider = ({
     peer.disconnect();
     peer.destroy();
     setConnections(new Map<string, DataConnection>());
-    setConnected(false);
+    setConnected(new Map<string, boolean>());
     setPeer(undefined);
     setPeerId(undefined);
   }, [peer]);
@@ -70,17 +76,22 @@ export const PeerContextProvider = ({
       return;
     }
 
-    const connectedHandler = () => {
-      setConnected(true);
-    };
+    function connectedHandler(this: DataConnection) {
+      setConnected((connected) => new Map(connected).set(this.label, true));
+    }
 
-    const disconnectedHandler = () => {
-      setConnected(false);
-    };
+    function disconnectedHandler(this: DataConnection) {
+      setConnected((connected) => new Map(connected).set(this.label, false));
+    }
 
-    const onDataHandler = (data: unknown) => {
-      setLastData(data as GameState);
-    };
+    function onDataHandler(this: DataConnection, data: unknown) {
+      console.log(this.label, "received data", data);
+      setLastMessages((lastMessages) => {
+        const newLastMessages = new Map(lastMessages);
+        newLastMessages.set(this.label, data as NetworkMessage);
+        return newLastMessages;
+      });
+    }
 
     const errorHandler = (error: unknown) => {
       console.error(error);
@@ -116,18 +127,19 @@ export const PeerContextProvider = ({
     }
 
     const openHandler = (id: string) => {
+      console.log("PEER ID CHANGED", id);
       setPeerId(id);
     };
 
     const connectedHandler = (connection: DataConnection) => {
-      setConnected(true);
+      setConnected((connected) => new Map(connected).set(connection.label, true));
       setConnections((connections) =>
         new Map(connections).set(connection.label, connection)
       );
     };
 
     const disconnectedHandler = () => {
-      setConnected(false);
+      peer.reconnect();
     };
 
     const errorHandler = (error: unknown) => {
@@ -136,8 +148,8 @@ export const PeerContextProvider = ({
 
     peer.on("open", openHandler);
     peer.on("error", errorHandler);
-    peer.on("connection", connectedHandler); // incoming
-    peer.on("disconnected", disconnectedHandler); // incoming
+    peer.on("connection", connectedHandler);
+    peer.on("disconnected", disconnectedHandler);
 
     return () => {
       peer.off("open", openHandler);
@@ -156,7 +168,8 @@ export const PeerContextProvider = ({
         disconnect,
         isConnected: connected,
         peerId,
-        lastData,
+        lastMessages,
+        connections,
       }}
     >
       {children}
