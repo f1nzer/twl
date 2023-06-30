@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Player } from "../../../models/state";
 import { usePeerContext } from "../../../hooks/usePeerContext";
-import { NetworkMessage, NetworkMessageType } from "../../../models/networking";
+import { NetworkMessage, NetworkMessageType, PlayerMessage } from "../../../models/networking";
 
 interface UsePlayersData {
   players: Player[];

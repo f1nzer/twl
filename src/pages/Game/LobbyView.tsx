@@ -13,6 +13,7 @@ export const LobbyView = ({ state, peerId }: LobbyViewProps) => {
   const playerUrl = `player?peerId=${peerId}`;
   return (
     <Stack
+      spacing={4}
       direction="column"
       height="100vh"
       alignItems="center"
