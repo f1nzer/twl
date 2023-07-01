@@ -1,58 +1,50 @@
-import { useEffect, useState } from "react";
-import { GameState, Player } from "../../models/state";
-import { NetworkMessageType } from "../../models/networking";
-import { usePlayerState } from "./hooks/usePlayerState";
+import { useState } from "react";
+import { Player } from "../../models/state";
 import { PlayersView } from "../Game/PlayersView";
-import { Box, Button } from "@mui/material";
-import { usePeerConnection } from "../../hooks/usePeerConnection";
+import { Alert, Box, Button, Snackbar, Stack } from "@mui/material";
 
 interface PlayerViewProps {
-  state: GameState;
+  players: Player[];
+  onVote: (player: Player) => void;
 }
 
-export const PlayerVoteView = ({ state }: PlayerViewProps) => {
-  const { connectionLabel } = usePlayerState();
-  const [playerToRemove, setPlayerToRemovePlayer] = useState<Player>();
-  const { send } = usePeerConnection(connectionLabel);
-
-  useEffect(() => {
-    if (!playerToRemove) {
-      return;
-    }
-
-    const player = state.players.filter(player => player.connectionLabel === connectionLabel)[0];
-    send(
-      {
-        type: NetworkMessageType.PLAYER_MESSAGE,
-        data: {
-          name: player.name,
-          votePlayerLabel: playerToRemove.connectionLabel
-        }
-      }
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playerToRemove]);
+export const PlayerVoteView = ({ players, onVote }: PlayerViewProps) => {
+  const [playerToRemove, setPlayerToRemove] = useState<Player>();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const onVoteClick = () => {
     //TODO get selected player to remove
-    const player = state.players[0];
-    setPlayerToRemovePlayer(player);
+    if (playerToRemove) {
+      onVote(playerToRemove);
+      setSnackbarOpen(true);
+      setPlayerToRemove(undefined);
+    }
   };
 
-  const round = state.round;
-  if (!round) {
-    return <>WAITING END ROUND</>
-  }
+  const handleClose = (_: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === "clickaway") {
+      return;
+    }
 
-  const candidatePlayers = state.players.filter((player, index) =>
-    round.activePlayersIndexes.includes(index) &&
-    player.connectionLabel !== connectionLabel);
+    setSnackbarOpen(false);
+  };
 
   return (
-    <>
-      <PlayersView players={candidatePlayers} />
+    <Stack direction="column" spacing={2}>
+      <PlayersView
+        players={players}
+        selectedPlayer={playerToRemove}
+        onClick={(player) =>
+          setPlayerToRemove((prevPlayer) =>
+            prevPlayer?.connectionLabel !== player.connectionLabel
+              ? player
+              : undefined
+          )
+        }
+      />
       <Box textAlign={"center"}>
         <Button
+          disabled={!playerToRemove}
           size="large"
           variant="contained"
           onClick={() => onVoteClick()}
@@ -60,6 +52,20 @@ export const PlayerVoteView = ({ state }: PlayerViewProps) => {
           ПРОГОЛОСОВАТЬ
         </Button>
       </Box>
-    </>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleClose}
+      >
+        <Alert
+          onClose={handleClose}
+          variant="filled"
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Голос отправлен!
+        </Alert>
+      </Snackbar>
+    </Stack>
   );
-}
+};

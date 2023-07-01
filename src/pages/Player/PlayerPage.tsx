@@ -1,16 +1,19 @@
 import { useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { CircularProgress } from "@mui/material";
-import { NetworkMessageType, PlayerMessage } from "../../models/networking";
+import { NetworkMessageType } from "../../models/networking";
 import { PlayerNameForm } from "./PlayerNameForm";
 import { usePlayerState } from "./hooks/usePlayerState";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
 import { GameStatus } from "../../models/state";
 import { PlayerVoteView } from "./PlayerVoteView";
+import { PlayerWaitingView } from "./PlayerWaitingView";
+import { useSessionStorageState } from "ahooks";
+import { PlayerService } from "../../services/PlayerService";
 
 export const PlayerPage = () => {
   const [searchParams] = useSearchParams();
-  const [playerMessage, setPlayerMessage] = useState<PlayerMessage>();
+  const [name, setName] = useSessionStorageState<string>("");
   const { connectionLabel, gameState } = usePlayerState();
   const { connect, send, isConnected } = usePeerConnection(connectionLabel);
 
@@ -28,37 +31,52 @@ export const PlayerPage = () => {
   }, [connect, isConnected, searchParams]);
 
   useEffect(() => {
-    if (!isConnected || !playerMessage) {
+    if (!isConnected || !name) {
       return;
     }
 
     send({
       type: NetworkMessageType.PLAYER_MESSAGE,
-      data: playerMessage,
+      data: { name },
     });
-  }, [isConnected, playerMessage, send]);
+  }, [isConnected, name, send]);
 
   if (!isConnected) {
     return <CircularProgress size={512} />;
   }
 
-  if (!playerMessage || !playerMessage.name) {
-    return (
-      <PlayerNameForm
-        onSubmit={(name) =>
-          setPlayerMessage((msg) => {
-            return {
-              ...msg,
-              name,
-            };
-          })
-        }
-      />
+  if (!name) {
+    return <PlayerNameForm onSubmit={(name) => setName(name)} />;
+  }
+
+  const isCurrentPlayerActive =
+    gameState?.round &&
+    PlayerService.getActivePlayers(gameState).some(
+      (player) => player.connectionLabel === connectionLabel
     );
+
+  if (gameState?.status === GameStatus.LOBBY || !isCurrentPlayerActive) {
+    return <PlayerWaitingView />;
   }
 
   if (gameState?.status === GameStatus.VOTE) {
-    return <PlayerVoteView state={gameState} />
+    const playersToVoteAgainst = PlayerService.getActivePlayers(
+      gameState
+    ).filter((x) => x.connectionLabel !== connectionLabel);
+
+    return (
+      <PlayerVoteView
+        players={playersToVoteAgainst}
+        onVote={(player) => {
+          send({
+            type: NetworkMessageType.PLAYER_MESSAGE,
+            data: {
+              votePlayerLabel: player.connectionLabel,
+            },
+          });
+        }}
+      />
+    );
   }
 
   return <>GAME STATE: {gameState?.status ?? "NO DATA"}</>;

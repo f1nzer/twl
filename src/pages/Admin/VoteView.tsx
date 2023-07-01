@@ -1,7 +1,8 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
-import { GameState, Player } from "../../models/state";
+import { Box, Button, Stack, Typography } from "@mui/material";
+import { GameState } from "../../models/state";
 import { PlayersView } from "../Game/PlayersView";
 import { usePlayerVotes } from "./hooks/usePlayerVotes";
+import { PlayerService } from "../../services/PlayerService";
 
 interface VoteViewProps {
   state: GameState;
@@ -11,41 +12,47 @@ interface VoteViewProps {
 export const VoteView = ({ state, onRoundStartClick }: VoteViewProps) => {
   const votes = usePlayerVotes();
 
-  const activePlayers: Player[] = state.players.filter((_player, index) =>
-    state.round?.activePlayersIndexes.includes(index)
-  );
+  const activePlayers = PlayerService.getActivePlayers(state);
 
   const playerVotes = activePlayers.map((player) => {
-    const voteFromPlayer = votes.find(
+    const playerVote = votes.find(
       (vote) => vote.connectionLabel === player.connectionLabel
     );
+
+    const targetPlayerVote = playerVote
+      ? activePlayers.find(
+          (x) => x.connectionLabel === playerVote.voteConnectionLabel
+        )
+      : null;
+
     return {
-      player,
-      votePlayerLabel: voteFromPlayer?.votePlayerLabel ?? "NO VOTE",
+      who: player,
+      against: targetPlayerVote,
     };
   });
 
+  console.log(playerVotes);
+
   return (
-    <>
-      <Grid>
+    <Stack direction="column" spacing={2}>
+      <Box>
         {playerVotes.map((vote) => {
-          const targetPlayer = activePlayers.find(x => x.connectionLabel === vote.votePlayerLabel);
-          const msg = `${vote.player.name} => ${targetPlayer?.name}`;
+          const msg = `${vote.who.name} => ${vote.against?.name ?? "NO VOTE"}`;
           return <Typography>{msg}</Typography>;
         })}
-        <PlayersView players={activePlayers} />
-        <Box textAlign={"center"}>
-          <Button
-            sx={{ width: 200 }}
-            size="large"
-            variant="contained"
-            color="success"
-            onClick={() => onRoundStartClick()}
-          >
-            НАЧАТЬ РАУНД
-          </Button>
-        </Box>
-      </Grid>
-    </>
+      </Box>
+      <PlayersView players={activePlayers} />
+      <Box textAlign={"center"}>
+        <Button
+          sx={{ width: 200 }}
+          size="large"
+          variant="contained"
+          color="success"
+          onClick={() => onRoundStartClick()}
+        >
+          НАЧАТЬ РАУНД
+        </Button>
+      </Box>
+    </Stack>
   );
 };

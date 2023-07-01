@@ -19,11 +19,11 @@ export const usePlayerVotes = (): PlayerVote[] => {
           );
 
           if (existingVoteIndex >= 0) {
-            newVotes[existingVoteIndex].votePlayerLabel = vote;
+            newVotes[existingVoteIndex].voteConnectionLabel = vote;
           } else {
             newVotes.push({
               connectionLabel: data.connectionLabel,
-              votePlayerLabel: vote,
+              voteConnectionLabel: vote,
             });
           }
 

@@ -34,10 +34,12 @@ export const RoundView = ({ state, onUpdateState }: RoundViewProps) => {
     return state.round?.activePlayersIndexes.includes(index) ?? true;
   });
 
+  const activePlayer = filteredPlayers[round.activePlayerIndex];
+
   return (
     <Stack direction="column" spacing={4}>
       <Timer seconds={round.roundDuration} />
-      <PlayerView player={filteredPlayers[round.activePlayerIndex]} />
+      <PlayerView player={activePlayer} />
 
       <Typography variant="h3" textAlign="center">
         {round.activeQuestionText}

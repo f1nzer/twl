@@ -153,11 +153,8 @@ export const PeerContextProvider = ({
 
     const errorHandler = (error: unknown) => {
       const { type: errorType } = error as { type: string };
-      if (errorType === "unavailable-id") {
-        disconnect();
-      } else {
-        console.error(error);
-      }
+      console.error(errorType, error);
+      disconnect();
     };
 
     peer.on("open", openHandler);

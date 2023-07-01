@@ -15,6 +15,7 @@ export const VoteView = ({ state }: VoteViewProps) => {
       height="100vh"
       alignItems="center"
       justifyContent="center"
+      spacing={2}
     >
       <PlayersView players={state.players} />
       <Box>
