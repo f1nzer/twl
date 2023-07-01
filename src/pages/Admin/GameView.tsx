@@ -4,13 +4,14 @@ import {
   ADMIN_CONNECTION_LABEL,
   NetworkMessageType,
 } from "../../models/networking";
-import { GameState, GameStatus, Player } from "../../models/state";
+import { GameState, GameStatus } from "../../models/state";
 import { RoundView } from "./RoundView";
 import { useEffect, useMemo, useState } from "react";
 import { RoundService } from "../../services/RoundService";
 import { usePlayers } from "./hooks/usePlayers";
 import { PlayersView } from "../Game/PlayersView";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
+import { VoteView } from "./VoteView";
 
 export const GameView = () => {
   const { connections, send: sendTo } = usePeerContext();
@@ -94,10 +95,6 @@ export const GameView = () => {
     setGameState(state);
   };
 
-  const activePlayers: Player[] = gameState.players.filter((_player, index) =>
-    gameState.round?.activePlayersIndexes.includes(index)
-  );
-
   if (gameState.status === GameStatus.LOBBY) {
     return (
       <>
@@ -120,24 +117,7 @@ export const GameView = () => {
   }
 
   if (gameState.status === GameStatus.VOTE) {
-    return (
-      <>
-        <Grid>
-          <PlayersView players={activePlayers} />
-          <Box textAlign={"center"}>
-            <Button
-              sx={{ width: 200 }}
-              size="large"
-              variant="contained"
-              color="success"
-              onClick={() => onRoundStartClick()}
-            >
-              НАЧАТЬ РАУНД
-            </Button>
-          </Box>
-        </Grid>
-      </>
-    );
+    return <VoteView state={gameState} onRoundStartClick={onRoundStartClick} />
   }
 
   if (gameState.status == GameStatus.ROUND) {

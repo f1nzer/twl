@@ -5,6 +5,8 @@ import { NetworkMessageType, PlayerMessage } from "../../models/networking";
 import { PlayerNameForm } from "./PlayerNameForm";
 import { usePlayerState } from "./hooks/usePlayerState";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
+import { GameStatus } from "../../models/state";
+import { PlayerVoteView } from "./PlayerVoteView";
 
 export const PlayerPage = () => {
   const [searchParams] = useSearchParams();
@@ -53,6 +55,10 @@ export const PlayerPage = () => {
         }
       />
     );
+  }
+
+  if (gameState?.status === GameStatus.VOTE) {
+    return <PlayerVoteView state={gameState} />
   }
 
   return <>GAME STATE: {gameState?.status ?? "NO DATA"}</>;

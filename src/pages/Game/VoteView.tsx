@@ -8,6 +8,7 @@ interface VoteViewProps {
 }
 
 export const VoteView = ({ state }: VoteViewProps) => {
+
   return (
     <Stack
       direction="column"
