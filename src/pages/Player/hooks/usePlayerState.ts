@@ -10,22 +10,24 @@ interface UsePlayerStateData {
 
 export const usePlayerState = (): UsePlayerStateData => {
   const [connectionLabel, setConnectionLabel] = useState<string>("");
-  const { peerId, lastMessages } = usePeerContext();
+  const { peerId, useSubscription } = usePeerContext();
   const [gameState, setGameState] = useState<GameState>();
 
   useEffect(() => {
     setConnectionLabel(peerId ? `player-${peerId}` : "");
   }, [peerId]);
 
-  useEffect(() => {
-    const msg = lastMessages.get(connectionLabel);
-    if (msg && msg.type === NetworkMessageType.GAME_STATE) {
-      setGameState(msg.data as GameState);
+  useSubscription((data) => {
+    if (
+      data.connectionLabel === connectionLabel &&
+      data.message.type === NetworkMessageType.GAME_STATE
+    ) {
+      setGameState(data.message.data as GameState);
     }
-  }, [connectionLabel, lastMessages]);
+  });
 
   return {
     connectionLabel,
     gameState,
-  }
-}
+  };
+};

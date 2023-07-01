@@ -1,35 +1,39 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Player } from "../../../models/state";
 import { usePeerContext } from "../../../hooks/usePeerContext";
-import { NetworkMessage, NetworkMessageType, PlayerMessage } from "../../../models/networking";
+import { NetworkMessageType, PlayerMessage } from "../../../models/networking";
 
-interface UsePlayersData {
-  players: Player[];
-}
-
-export const usePlayers = (): UsePlayersData => {
+export const usePlayers = (): Player[] => {
   const [players, setPlayers] = useState<Player[]>([]);
-  const { lastMessages } = usePeerContext();
+  const { useSubscription } = usePeerContext();
 
-  useEffect(() => {
-    setPlayers((players) => {
-      const newPlayers: Player[] = [];
-      lastMessages.forEach((message: NetworkMessage, connectionLabel: string) => {
-        if (message && message.type === NetworkMessageType.PLAYER_MESSAGE) {
-          const playerData = message.data as PlayerMessage;
-          const player = players.find(p => p.connectionLabel === connectionLabel);
-          const newPlayer: Player = player
-            ? { ...player, name: playerData.name, connectionLabel }
-            : { name: playerData.name, connectionLabel };
-          newPlayers.push(newPlayer);
+  useSubscription((data) => {
+    if (data.message.type === NetworkMessageType.PLAYER_MESSAGE) {
+      const playerMessage = data.message.data as PlayerMessage;
+      if (!playerMessage.name) {
+        return;
+      }
+
+      const playerName = playerMessage.name;
+      setPlayers((players) => {
+        const newPlayers = [...players];
+        const existingPlayerIndex = newPlayers.findIndex(
+          (player) => player.connectionLabel === data.connectionLabel
+        );
+
+        if (existingPlayerIndex >= 0) {
+          newPlayers[existingPlayerIndex].name = playerName;
+        } else {
+          newPlayers.push({
+            name: playerName,
+            connectionLabel: data.connectionLabel,
+          });
         }
+
+        return newPlayers;
       });
+    }
+  });
 
-      return newPlayers;
-    });
-  }, [lastMessages]);
-
-  return {
-    players
-  }
-}
+  return players;
+};

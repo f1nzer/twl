@@ -1,27 +1,38 @@
 import { Box, Button, Grid, Typography } from "@mui/material";
-import { GameState, Player } from "../../models/state"
+import { GameState, Player } from "../../models/state";
 import { PlayersView } from "../Game/PlayersView";
-import { usePlayersVoteMessages } from "./hooks/usePlayersVoteMessages";
+import { usePlayerVotes } from "./hooks/usePlayerVotes";
 
 interface VoteViewProps {
-  state: GameState,
+  state: GameState;
   onRoundStartClick: () => void;
 }
 
 export const VoteView = ({ state, onRoundStartClick }: VoteViewProps) => {
-  //TODO clean up vote messages after round or handle each message 
-  const { voteMessages } = usePlayersVoteMessages();
+  const votes = usePlayerVotes();
 
   const activePlayers: Player[] = state.players.filter((_player, index) =>
     state.round?.activePlayersIndexes.includes(index)
   );
 
+  const playerVotes = activePlayers.map((player) => {
+    const voteFromPlayer = votes.find(
+      (vote) => vote.connectionLabel === player.connectionLabel
+    );
+    return {
+      player,
+      votePlayerLabel: voteFromPlayer?.votePlayerLabel ?? "NO VOTE",
+    };
+  });
+
   return (
     <>
       <Grid>
-        {voteMessages.map(voteMessage => (
-          <Typography>{voteMessage.name} ={">"} {voteMessage.votePlayerLabel}</Typography>
-        ))}
+        {playerVotes.map((vote) => {
+          const targetPlayer = activePlayers.find(x => x.connectionLabel === vote.votePlayerLabel);
+          const msg = `${vote.player.name} => ${targetPlayer?.name}`;
+          return <Typography>{msg}</Typography>;
+        })}
         <PlayersView players={activePlayers} />
         <Box textAlign={"center"}>
           <Button
@@ -37,4 +48,4 @@ export const VoteView = ({ state, onRoundStartClick }: VoteViewProps) => {
       </Grid>
     </>
   );
-}
+};

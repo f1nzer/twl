@@ -16,7 +16,6 @@ export enum GameStatus {
 export interface Player {
   name: string;
   connectionLabel: string;
-  votePlayerLabel?: string;
 
   statistics?: PlayerRoundStatistics[];
 }

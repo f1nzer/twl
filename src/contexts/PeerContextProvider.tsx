@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { PeerContext } from "./PeerContext";
 import Peer, { DataConnection } from "peerjs";
-import { NetworkMessage } from "../models/networking";
+import { NetworkMessage, ReceivedNetworkMessage } from "../models/networking";
+import { useEventEmitter } from "ahooks";
 
 export const PeerContextProvider = ({
   children,
@@ -9,14 +10,13 @@ export const PeerContextProvider = ({
   const [peer, setPeer] = useState<Peer>();
   const [peerId, setPeerId] = useState<string>();
 
+  const dataEmitter = useEventEmitter<ReceivedNetworkMessage>();
+
   const [connected, setConnected] = useState<Map<string, boolean>>(
     new Map<string, boolean>()
   );
   const [connections, setConnections] = useState<Map<string, DataConnection>>(
     new Map<string, DataConnection>()
-  );
-  const [lastMessages, setLastMessages] = useState<Map<string, NetworkMessage>>(
-    new Map<string, NetworkMessage>()
   );
 
   const connect = useCallback(
@@ -92,10 +92,9 @@ export const PeerContextProvider = ({
 
     function onDataHandler(this: DataConnection, data: unknown) {
       console.log(this.label, "received data", data);
-      setLastMessages((lastMessages) => {
-        const newLastMessages = new Map(lastMessages);
-        newLastMessages.set(this.label, data as NetworkMessage);
-        return newLastMessages;
+      dataEmitter.emit({
+        connectionLabel: this.label,
+        message: data as NetworkMessage,
       });
     }
 
@@ -125,7 +124,7 @@ export const PeerContextProvider = ({
         connection.off("iceStateChanged", iceStateChangedHandler);
       }
     };
-  }, [connections]);
+  }, [connections, dataEmitter]);
 
   useEffect(() => {
     if (!peer) {
@@ -195,10 +194,9 @@ export const PeerContextProvider = ({
         connect,
         disconnect,
         isConnected: connected,
-        peer,
         peerId,
-        lastMessages,
         connections,
+        useSubscription: dataEmitter.useSubscription,
       }}
     >
       {children}

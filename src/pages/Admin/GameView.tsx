@@ -16,7 +16,7 @@ import { VoteView } from "./VoteView";
 export const GameView = () => {
   const { connections, send: sendTo } = usePeerContext();
   const { isConnected, send } = usePeerConnection(ADMIN_CONNECTION_LABEL);
-  const { players } = usePlayers();
+  const players = usePlayers();
   const [gameState, setGameState] = useState<GameState>({
     bankTotal: 0,
     players: [],
@@ -42,8 +42,8 @@ export const GameView = () => {
         connection.label
       );
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeGameStatus]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeGameStatus, connections, isConnected, sendTo]);
 
   useEffect(() => {
     if (!isConnected) {
@@ -117,7 +117,7 @@ export const GameView = () => {
   }
 
   if (gameState.status === GameStatus.VOTE) {
-    return <VoteView state={gameState} onRoundStartClick={onRoundStartClick} />
+    return <VoteView state={gameState} onRoundStartClick={onRoundStartClick} />;
   }
 
   if (gameState.status == GameStatus.ROUND) {
