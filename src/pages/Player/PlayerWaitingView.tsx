@@ -1,3 +1,5 @@
+import waitingVideo from "/waiting.mp4";
+
 export const PlayerWaitingView = () => {
   return (
     <>
@@ -5,7 +7,6 @@ export const PlayerWaitingView = () => {
         autoPlay
         muted
         loop
-        id="myVideo"
         style={{
           position: "fixed",
           right: 0,
@@ -15,7 +16,7 @@ export const PlayerWaitingView = () => {
           objectFit: "cover",
         }}
       >
-        <source src="/waiting.mp4" type="video/mp4" />
+        <source src={waitingVideo} type="video/mp4" />
       </video>
     </>
   );
