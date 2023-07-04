@@ -1,4 +1,4 @@
-import { Box, Button, Grid } from "@mui/material";
+import { Button, Grid, Stack } from "@mui/material";
 import { usePeerContext } from "../../hooks/usePeerContext";
 import {
   ADMIN_CONNECTION_LABEL,
@@ -12,6 +12,7 @@ import { usePlayers } from "./hooks/usePlayers";
 import { PlayersView } from "../Game/PlayersView";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
 import { VoteView } from "./VoteView";
+import { LoadQuestionView } from "./LoadQuestionView";
 
 export const GameView = () => {
   const { connections, send: sendTo } = usePeerContext();
@@ -95,22 +96,27 @@ export const GameView = () => {
     setGameState(state);
   };
 
+  const isReadyToStartGame = () => {
+    return gameState.players.length <= 1;
+  }
+
   if (gameState.status === GameStatus.LOBBY) {
     return (
       <>
         <Grid>
           <PlayersView players={gameState.players} />
-          <Box textAlign={"center"}>
+          <Stack direction="row" spacing={2}>
             <Button
               size="large"
               variant="contained"
               color="success"
-              disabled={gameState.players.length <= 1}
+              disabled={isReadyToStartGame()}
               onClick={() => onGameStartClick()}
             >
               НАЧАТЬ ИГРУ
             </Button>
-          </Box>
+            <LoadQuestionView />
+          </Stack>
         </Grid>
       </>
     );
