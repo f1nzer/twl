@@ -4,7 +4,7 @@ import {
   ADMIN_CONNECTION_LABEL,
   NetworkMessageType,
 } from "../../models/networking";
-import { GameState, GameStatus } from "../../models/state";
+import { GameState, GameStatus, Player } from "../../models/state";
 import { RoundView } from "./RoundView";
 import { useEffect, useMemo, useState } from "react";
 import { RoundService } from "../../services/RoundService";
@@ -13,6 +13,7 @@ import { PlayersView } from "../Game/PlayersView";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
 import { VoteView } from "./VoteView";
 import { LoadQuestionView } from "./LoadQuestionView";
+import { PlayerService } from "../../services/PlayerService";
 
 export const GameView = () => {
   const { connections, send: sendTo } = usePeerContext();
@@ -73,9 +74,15 @@ export const GameView = () => {
     setGameState(newState);
   };
 
-  const onRoundStartClick = () => {
-    //TODO filter by removed player
-    const activePlayersIndexes = [...Array(gameState.players.length).keys()];
+  const onRoundStartClick = (playerToRemove: Player | undefined) => {
+    if (!playerToRemove) {
+      return;
+    }
+    const playerToRemoveIndex = gameState.players.indexOf(playerToRemove);
+    const activePlayersIndexes = PlayerService.getActivePlayers(gameState)
+      .map((_player, index) => index)
+      .filter(x => x !== playerToRemoveIndex);
+
     const newState = RoundService.createNewRoundState(
       gameState,
       activePlayersIndexes

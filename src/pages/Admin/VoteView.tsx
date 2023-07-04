@@ -1,16 +1,24 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
-import { GameState } from "../../models/state";
+import { GameState, Player } from "../../models/state";
 import { PlayersView } from "../Game/PlayersView";
 import { usePlayerVotes } from "./hooks/usePlayerVotes";
 import { PlayerService } from "../../services/PlayerService";
+import { useState } from "react";
 
 interface VoteViewProps {
   state: GameState;
-  onRoundStartClick: () => void;
+  onRoundStartClick: (playerToRemove: Player | undefined) => void;
 }
+
+// interface VoteStat {
+//   player: Player;
+//   votesCount: number;
+// }
 
 export const VoteView = ({ state, onRoundStartClick }: VoteViewProps) => {
   const votes = usePlayerVotes();
+
+  const [playerToRemove, setPlayerToRemove] = useState<Player>();
 
   const activePlayers = PlayerService.getActivePlayers(state);
 
@@ -21,8 +29,8 @@ export const VoteView = ({ state, onRoundStartClick }: VoteViewProps) => {
 
     const targetPlayerVote = playerVote
       ? activePlayers.find(
-          (x) => x.connectionLabel === playerVote.voteConnectionLabel
-        )
+        (x) => x.connectionLabel === playerVote.voteConnectionLabel
+      )
       : null;
 
     return {
@@ -30,6 +38,22 @@ export const VoteView = ({ state, onRoundStartClick }: VoteViewProps) => {
       against: targetPlayerVote,
     };
   });
+
+  // const [voteStats, setVoteStats] = useState<VoteStat[]>([]);
+  // const updateVoteStats = (against: Player) => {
+  //   const updatedVoteStats = [...voteStats];
+  //   const playerIndex = updatedVoteStats.findIndex(x => x.player.connectionLabel === against.connectionLabel);
+  //   if (playerIndex > -1) {
+  //     updatedVoteStats[playerIndex].votesCount += 1;
+  //   } else {
+  //     updatedVoteStats.push({ player: against, votesCount: 1 });
+  //   }
+  //   setVoteStats(updatedVoteStats);
+  // }
+
+  const onPlayerSelected = (player: Player) => {
+    setPlayerToRemove(player);
+  }
 
   console.log(playerVotes);
 
@@ -41,14 +65,15 @@ export const VoteView = ({ state, onRoundStartClick }: VoteViewProps) => {
           return <Typography>{msg}</Typography>;
         })}
       </Box>
-      <PlayersView players={activePlayers} />
+      <PlayersView players={activePlayers} onClick={onPlayerSelected} selectedPlayer={playerToRemove} />
       <Box textAlign={"center"}>
         <Button
           sx={{ width: 200 }}
           size="large"
           variant="contained"
           color="success"
-          onClick={() => onRoundStartClick()}
+          disabled={!playerToRemove}
+          onClick={() => onRoundStartClick(playerToRemove)}
         >
           НАЧАТЬ РАУНД
         </Button>
@@ -56,3 +81,4 @@ export const VoteView = ({ state, onRoundStartClick }: VoteViewProps) => {
     </Stack>
   );
 };
+
