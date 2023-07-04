@@ -19,14 +19,7 @@ export const RoundView = ({ state }: RoundViewProps) => {
   });
 
   return (
-    <Stack
-      height="100vh"
-      spacing={10}
-      marginX={10}
-      direction="row"
-      alignItems="center"
-      justifyContent="center"
-    >
+    <Stack spacing={10} marginX={10} direction="row" alignItems="center">
       <Box>
         <BankView state={state} />
       </Box>

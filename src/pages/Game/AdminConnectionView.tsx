@@ -26,12 +26,7 @@ const QrView = ({ peerId }: AdminConnectionViewProps) => {
 
 export const AdminConnectionView = ({ peerId }: AdminConnectionViewProps) => {
   return (
-    <Stack
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      sx={{ minHeight: "100vh" }}
-    >
+    <Stack direction="column" alignItems="center">
       <Typography variant="h1">ADMIN</Typography>
       <Box>
         <QrView peerId={peerId} />

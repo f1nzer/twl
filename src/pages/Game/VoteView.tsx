@@ -8,15 +8,8 @@ interface VoteViewProps {
 }
 
 export const VoteView = ({ state }: VoteViewProps) => {
-
   return (
-    <Stack
-      direction="column"
-      height="100vh"
-      alignItems="center"
-      justifyContent="center"
-      spacing={2}
-    >
+    <Stack direction="column" alignItems="center" spacing={2}>
       <PlayersView players={state.players} />
       <Box>
         <BankItemView isSummary value={`БАНК: ${state.bankTotal}`} />

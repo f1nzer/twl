@@ -2,7 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
 import { GameView } from "./GameView";
-import { CircularProgress, Grid } from "@mui/material";
+import { Box, CircularProgress, Container } from "@mui/material";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
 
 export const AdminPage = () => {
@@ -31,16 +31,15 @@ export const AdminPage = () => {
   // TODO: debug button to RESET state to start from the beginning
 
   return (
-    <Grid container spacing={2} height="100vh">
-      <Grid
-        item
-        xs={12}
+    <Container maxWidth="md">
+      <Box
+        height="100vh"
         display="flex"
         alignItems="center"
         justifyContent="center"
       >
         {isConnected ? <GameView /> : <CircularProgress size={size} />}
-      </Grid>
-    </Grid>
+      </Box>
+    </Container>
   );
 };

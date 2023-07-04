@@ -4,8 +4,10 @@ import { QuestionStorage } from "./QuestionStorage";
 const defaultPiceValues: number[] = [1000, 2000, 3000, 4000, 5000, 10000];
 
 export const RoundService = {
-
-  createNewRoundState: (state: GameState, activePlayersIndexes: number[]): GameState => {
+  createNewRoundState: (
+    state: GameState,
+    activePlayersIndexes: number[]
+  ): GameState => {
     const newState: GameState = {
       ...state,
       status: GameStatus.ROUND,
@@ -13,13 +15,13 @@ export const RoundService = {
       round: {
         activePlayerIndex: 0, //TODO start from the MVP player
         activePlayersIndexes,
-        activeQuestionText: QuestionStorage.getNext(),
+        activeQuestionText: QuestionStorage.getNext().text,
         priceValues: defaultPiceValues,
         currentPriceIndex: 0,
         bankTotal: 0,
         startTimerDate: Date.now(),
         roundDuration: 10 + activePlayersIndexes.length * 1,
-      }
+      },
     };
 
     return newState;
@@ -60,7 +62,7 @@ export const RoundService = {
     round.currentPriceIndex = 0;
     round.activePlayerIndex =
       (round.activePlayerIndex + 1) % round.activePlayersIndexes.length;
-    round.activeQuestionText = QuestionStorage.getNext();
+    round.activeQuestionText = QuestionStorage.getNext().text;
     return newState;
   },
 
@@ -73,11 +75,13 @@ export const RoundService = {
     }
 
     const maxBankValue = round.priceValues[round.priceValues.length - 1];
-    const nextPotentialBankValue = round.bankTotal + round.priceValues[round.currentPriceIndex];
+    const nextPotentialBankValue =
+      round.bankTotal + round.priceValues[round.currentPriceIndex];
     const isBankLimitReached = nextPotentialBankValue >= maxBankValue;
 
     const maxPriceValueIndex = round.priceValues.length - 1;
-    const isPriceIndexEndReached = round.currentPriceIndex >= maxPriceValueIndex;
+    const isPriceIndexEndReached =
+      round.currentPriceIndex >= maxPriceValueIndex;
 
     if (isBankLimitReached || isPriceIndexEndReached) {
       newState.status = GameStatus.VOTE;
@@ -90,10 +94,10 @@ export const RoundService = {
     round.currentPriceIndex += 1;
     round.activePlayerIndex =
       (round.activePlayerIndex + 1) % round.activePlayersIndexes.length;
-    round.activeQuestionText = QuestionStorage.getNext();
+    round.activeQuestionText = QuestionStorage.getNext().text;
     return newState;
-  }
-}
+  },
+};
 
 const getNewStatus = (round: RoundState): GameStatus => {
   return isRoundExpired(round) ? GameStatus.VOTE : GameStatus.ROUND;
@@ -102,5 +106,7 @@ const getNewStatus = (round: RoundState): GameStatus => {
 const isRoundExpired = (round: RoundState) => {
   const nowDate = new Date();
   const startTimerDate = new Date(round.startTimerDate);
-  return (nowDate.getTime() - startTimerDate.getTime()) / 1000 > round.roundDuration;
+  return (
+    (nowDate.getTime() - startTimerDate.getTime()) / 1000 > round.roundDuration
+  );
 };

@@ -1,4 +1,4 @@
-import { Button, Grid, Stack } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import { usePeerContext } from "../../hooks/usePeerContext";
 import {
   ADMIN_CONNECTION_LABEL,
@@ -12,7 +12,7 @@ import { usePlayers } from "./hooks/usePlayers";
 import { PlayersView } from "../Game/PlayersView";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
 import { VoteView } from "./VoteView";
-import { LoadQuestionView } from "./LoadQuestionView";
+import { LoadQuestionButton } from "./LoadQuestionButton";
 import { PlayerService } from "../../services/PlayerService";
 
 export const GameView = () => {
@@ -74,14 +74,14 @@ export const GameView = () => {
     setGameState(newState);
   };
 
-  const onRoundStartClick = (playerToRemove: Player | undefined) => {
+  const onRoundStartClick = (playerToRemove?: Player) => {
     if (!playerToRemove) {
       return;
     }
     const playerToRemoveIndex = gameState.players.indexOf(playerToRemove);
     const activePlayersIndexes = PlayerService.getActivePlayers(gameState)
       .map((_player, index) => index)
-      .filter(x => x !== playerToRemoveIndex);
+      .filter((x) => x !== playerToRemoveIndex);
 
     const newState = RoundService.createNewRoundState(
       gameState,
@@ -103,29 +103,24 @@ export const GameView = () => {
     setGameState(state);
   };
 
-  const isReadyToStartGame = () => {
-    return gameState.players.length <= 1;
-  }
-
   if (gameState.status === GameStatus.LOBBY) {
+    const isNotReadyToStart = !gameState.players.length;
     return (
-      <>
-        <Grid>
-          <PlayersView players={gameState.players} />
-          <Stack direction="row" spacing={2}>
-            <Button
-              size="large"
-              variant="contained"
-              color="success"
-              disabled={isReadyToStartGame()}
-              onClick={() => onGameStartClick()}
-            >
-              НАЧАТЬ ИГРУ
-            </Button>
-            <LoadQuestionView />
-          </Stack>
-        </Grid>
-      </>
+      <Stack direction="column" spacing={2}>
+        <PlayersView players={gameState.players} />
+        <Stack direction="row" spacing={2} justifyContent="center">
+          <Button
+            size="large"
+            variant="contained"
+            color="success"
+            disabled={isNotReadyToStart}
+            onClick={() => onGameStartClick()}
+          >
+            НАЧАТЬ ИГРУ
+          </Button>
+          <LoadQuestionButton />
+        </Stack>
+      </Stack>
     );
   }
 

@@ -12,13 +12,7 @@ interface LobbyViewProps {
 export const LobbyView = ({ state, peerId }: LobbyViewProps) => {
   const playerUrl = `player?peerId=${peerId}`;
   return (
-    <Stack
-      spacing={4}
-      direction="column"
-      height="100vh"
-      alignItems="center"
-      justifyContent="center"
-    >
+    <Stack spacing={4} direction="column" alignItems="center">
       <PlayersView players={state.players} />
       <Link to={playerUrl} target="_blank" rel="noopener noreferrer">
         <QRCode value={`${location.href}#/${playerUrl}`} />

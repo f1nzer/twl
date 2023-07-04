@@ -3,6 +3,7 @@ import { GameState } from "../../models/state";
 import { PlayerView } from "../Game/PlayersView";
 import { Timer } from "../Game/Timer";
 import { RoundService } from "../../services/RoundService";
+import { QuestionStorage } from "../../services/QuestionStorage";
 
 interface RoundViewProps {
   state: GameState;
@@ -41,8 +42,12 @@ export const RoundView = ({ state, onUpdateState }: RoundViewProps) => {
       <Timer seconds={round.roundDuration} />
       <PlayerView player={activePlayer} />
 
-      <Typography variant="h3" textAlign="center">
+      <Typography variant="h4" textAlign="center">
         {round.activeQuestionText}
+      </Typography>
+
+      <Typography variant="h3" textAlign="center">
+        {QuestionStorage.getCurrent().answer}
       </Typography>
 
       <Stack direction="row" spacing={2}>

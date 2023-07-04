@@ -5,9 +5,9 @@ import { GameState, GameStatus } from "../../models/state";
 import { VoteView } from "./VoteView";
 import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
-import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Container } from "@mui/material";
 
-export const GamePage = () => {
+const GameView = () => {
   const { isConnected, lastMessage, peerId, connection } = usePeerConnection(
     ADMIN_CONNECTION_LABEL
   );
@@ -34,5 +34,20 @@ export const GamePage = () => {
     return <RoundView state={gameState} />;
   }
 
-  return <>game page</>;
+  return <>unknown status</>;
+};
+
+export const GamePage = () => {
+  return (
+    <Container maxWidth="lg">
+      <Box
+        height="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <GameView />
+      </Box>
+    </Container>
+  );
 };
