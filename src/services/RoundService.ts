@@ -20,7 +20,7 @@ export const RoundService = {
         currentPriceIndex: 0,
         bankTotal: 0,
         startTimerDate: Date.now(),
-        roundDuration: 10 + activePlayersIndexes.length * 1,
+        roundDuration: 60 + activePlayersIndexes.length * 10,
       },
     };
 
