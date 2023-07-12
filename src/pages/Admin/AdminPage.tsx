@@ -4,12 +4,15 @@ import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
 import { GameView } from "./GameView";
 import { Box, CircularProgress, Container } from "@mui/material";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
+import { useNoSleep } from "../../hooks/useNoSleep";
 
 export const AdminPage = () => {
   const [searchParams] = useSearchParams();
   const { connect, isConnected, peerId } = usePeerConnection(
     ADMIN_CONNECTION_LABEL
   );
+
+  useNoSleep();
 
   const size = 256;
 

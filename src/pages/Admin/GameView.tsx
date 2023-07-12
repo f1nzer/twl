@@ -128,7 +128,7 @@ export const GameView = () => {
     return <VoteView state={gameState} onRoundStartClick={onRoundStartClick} />;
   }
 
-  if (gameState.status == GameStatus.ROUND) {
+  if (gameState.status === GameStatus.ROUND) {
     return <RoundView state={gameState} onUpdateState={onUpdateState} />;
   }
 
