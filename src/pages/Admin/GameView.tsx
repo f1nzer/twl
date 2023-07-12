@@ -13,7 +13,7 @@ import { PlayersView } from "../Game/PlayersView";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
 import { VoteView } from "./VoteView";
 import { LoadQuestionButton } from "./LoadQuestionButton";
-import { PlayerService } from "../../services/PlayerService";
+// import { PlayerService } from "../../services/PlayerService";
 
 export const GameView = () => {
   const { connections, send: sendTo } = usePeerContext();
@@ -78,11 +78,12 @@ export const GameView = () => {
     if (!playerToRemove) {
       return;
     }
-    const playerToRemoveIndex = gameState.players.indexOf(playerToRemove);
-    const activePlayersIndexes = PlayerService.getActivePlayers(gameState)
-      .map((_player, index) => index)
-      .filter((x) => x !== playerToRemoveIndex);
+    // const playerToRemoveIndex = gameState.players.indexOf(playerToRemove);
+    // const activePlayersIndexes = PlayerService.getActivePlayers(gameState)
+    //   .map((_player, index) => index)
+    //   .filter((x) => x !== playerToRemoveIndex);
 
+    const activePlayersIndexes = [...Array(gameState.players.length).keys()];
     const newState = RoundService.createNewRoundState(
       gameState,
       activePlayersIndexes
