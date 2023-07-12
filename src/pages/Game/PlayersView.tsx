@@ -97,19 +97,25 @@ export const PlayersView = ({
         useFlexGap
         flexWrap="wrap"
       >
-        {players.map((player, index) => {
-          const onClickHandler = onClick ? () => onClick(player) : undefined;
-          return (
-            <PlayerView
-              key={`player_${index}`}
-              player={player}
-              selected={
-                player.connectionLabel === selectedPlayer?.connectionLabel
-              }
-              onClick={onClickHandler}
-            />
-          );
-        })}
+        {players.length ? (
+          players.map((player, index) => {
+            const onClickHandler = onClick ? () => onClick(player) : undefined;
+            return (
+              <PlayerView
+                key={`player_${index}`}
+                player={player}
+                selected={
+                  player.connectionLabel === selectedPlayer?.connectionLabel
+                }
+                onClick={onClickHandler}
+              />
+            );
+          })
+        ) : (
+          <span style={{ fontSize: "56px", fontWeight: "bold" }}>
+            Пока нет ни одного еблана
+          </span>
+        )}
       </Stack>
     </Box>
   );

@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
-import { Box, CircularProgress, Container } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import { NetworkMessageType } from "../../models/networking";
 import { PlayerNameForm } from "./PlayerNameForm";
 import { usePlayerState } from "./hooks/usePlayerState";
@@ -10,6 +10,7 @@ import { PlayerVoteView } from "./PlayerVoteView";
 import { PlayerWaitingView } from "./PlayerWaitingView";
 import { useSessionStorageState } from "ahooks";
 import { PlayerService } from "../../services/PlayerService";
+import Spinner from "../../components/Spinner";
 import { useNoSleep } from "../../hooks/useNoSleep";
 
 const PlayerPageView = () => {
@@ -43,7 +44,7 @@ const PlayerPageView = () => {
   }, [isConnected, name, send]);
 
   if (!isConnected) {
-    return <CircularProgress size={512} />;
+    return <Spinner />;
   }
 
   if (!name) {
