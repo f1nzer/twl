@@ -27,7 +27,12 @@ export const LoadQuestionButton = () => {
   };
 
   return (
-    <Button variant="contained" component="label" size="large">
+    <Button
+      variant="contained"
+      component="label"
+      size="large"
+      sx={{ textAlign: "center" }}
+    >
       Загрузить вопросы
       <input type="file" hidden accept=".csv" onChange={(e) => onLoadFile(e)} />
     </Button>

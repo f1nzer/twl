@@ -110,6 +110,7 @@ export const GameView = () => {
         <PlayersView players={gameState.players} />
         <Stack direction="row" spacing={2} justifyContent="center">
           <Button
+            sx={{ textAlign: "center" }}
             size="large"
             variant="contained"
             color="success"

@@ -90,7 +90,7 @@ export const PlayerPage = () => {
   return (
     <Container maxWidth="md">
       <Box
-        height="100%"
+        minHeight="100vh"
         display="flex"
         alignItems="center"
         justifyContent="center"

@@ -38,6 +38,7 @@ export const AdminPage = () => {
     <Container maxWidth="md">
       <Box
         minHeight="100vh"
+        paddingY={4}
         display="flex"
         alignItems="center"
         justifyContent="center"

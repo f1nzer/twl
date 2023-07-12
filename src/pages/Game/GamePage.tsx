@@ -45,7 +45,7 @@ export const GamePage = () => {
   return (
     <Container maxWidth="lg">
       <Box
-        height="100%"
+        minHeight="100vh"
         display="flex"
         alignItems="center"
         justifyContent="center"

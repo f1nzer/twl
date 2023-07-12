@@ -1,7 +1,9 @@
 import { GameState, GameStatus, RoundState } from "../models/state";
 import { QuestionStorage } from "./QuestionStorage";
 
-const defaultPiceValues: number[] = [1000, 2000, 3000, 4000, 5000, 10000];
+const defaultPiceValues: number[] = [
+  1_000, 2_000, 5_000, 10_000, 20_000, 30_000, 40_000, 50_000,
+];
 
 export const RoundService = {
   createNewRoundState: (
