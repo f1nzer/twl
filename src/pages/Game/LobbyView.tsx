@@ -18,7 +18,7 @@ export const LobbyView = ({ state, peerId }: LobbyViewProps) => {
         <QRCode
           size={512}
           style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-          value={`http://192.168.1.106:5173#/${playerUrl}`}
+          value={`${location.href}#/${playerUrl}`}
         />
       </Link>
     </Stack>
