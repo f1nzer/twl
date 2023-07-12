@@ -18,6 +18,7 @@ export const PlayerWaitingView = () => {
         }}
       >
         <source src={waitingVideo} type="video/mp4" />
+        Your browser does not support the video tag.
       </video>
     </>
   );
