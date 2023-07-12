@@ -5,12 +5,15 @@ import { GameView } from "./GameView";
 import { Box, Container } from "@mui/material";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
 import Spinner from "../../components/Spinner";
+import { useNoSleep } from "../../hooks/useNoSleep";
 
 export const AdminPage = () => {
   const [searchParams] = useSearchParams();
   const { connect, isConnected, peerId } = usePeerConnection(
     ADMIN_CONNECTION_LABEL
   );
+
+  useNoSleep();
 
   const size = 256;
 

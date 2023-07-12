@@ -7,6 +7,7 @@ import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
 import { Box, Container } from "@mui/material";
 import Spinner from "../../components/Spinner";
+import { useNoSleep } from "../../hooks/useNoSleep";
 
 const GameView = () => {
   const { isConnected, lastMessage, peerId, connection } = usePeerConnection(
@@ -27,7 +28,7 @@ const GameView = () => {
     return <LobbyView state={gameState} peerId={connection.peer} />;
   }
 
-  if (gameState.status == GameStatus.VOTE) {
+  if (gameState.status === GameStatus.VOTE) {
     return <VoteView state={gameState} />;
   }
 
@@ -39,6 +40,8 @@ const GameView = () => {
 };
 
 export const GamePage = () => {
+  useNoSleep();
+
   return (
     <Container maxWidth="lg">
       <Box

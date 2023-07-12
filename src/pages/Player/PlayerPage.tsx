@@ -11,6 +11,7 @@ import { PlayerWaitingView } from "./PlayerWaitingView";
 import { useSessionStorageState } from "ahooks";
 import { PlayerService } from "../../services/PlayerService";
 import Spinner from "../../components/Spinner";
+import { useNoSleep } from "../../hooks/useNoSleep";
 
 const PlayerPageView = () => {
   const [searchParams] = useSearchParams();
@@ -84,6 +85,8 @@ const PlayerPageView = () => {
 };
 
 export const PlayerPage = () => {
+  useNoSleep();
+
   return (
     <Container maxWidth="md">
       <Box

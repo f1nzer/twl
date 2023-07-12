@@ -23,7 +23,7 @@ export const BankView = ({ state }: BankViewProps) => {
               key={`${value}_${index}`}
               value={value}
               isActive={
-                round.currentPriceIndex == priceValues.length - 1 - index
+                round.currentPriceIndex === priceValues.length - 1 - index
               }
             />
           ))}
