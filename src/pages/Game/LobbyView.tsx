@@ -15,7 +15,11 @@ export const LobbyView = ({ state, peerId }: LobbyViewProps) => {
     <Stack spacing={4} direction="column" alignItems="center">
       <PlayersView players={state.players} />
       <Link to={playerUrl} target="_blank" rel="noopener noreferrer">
-        <QRCode value={`${location.href}#/${playerUrl}`} />
+        <QRCode
+          size={512}
+          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+          value={`${location.href}#/${playerUrl}`}
+        />
       </Link>
     </Stack>
   );

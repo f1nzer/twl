@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
-import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Container } from "@mui/material";
 import { NetworkMessageType } from "../../models/networking";
 import { PlayerNameForm } from "./PlayerNameForm";
 import { usePlayerState } from "./hooks/usePlayerState";
@@ -11,7 +11,7 @@ import { PlayerWaitingView } from "./PlayerWaitingView";
 import { useSessionStorageState } from "ahooks";
 import { PlayerService } from "../../services/PlayerService";
 
-export const PlayerPage = () => {
+const PlayerPageView = () => {
   const [searchParams] = useSearchParams();
   const [name, setName] = useSessionStorageState<string>("");
   const { connectionLabel, gameState } = usePlayerState();
@@ -80,4 +80,19 @@ export const PlayerPage = () => {
   }
 
   return <>GAME STATE: {gameState?.status ?? "NO DATA"}</>;
+};
+
+export const PlayerPage = () => {
+  return (
+    <Container maxWidth="md">
+      <Box
+        height="100%"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <PlayerPageView />
+      </Box>
+    </Container>
+  );
 };

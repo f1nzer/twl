@@ -7,6 +7,7 @@ export const PlayerWaitingView = () => {
         autoPlay
         muted
         loop
+        playsInline
         style={{
           position: "fixed",
           right: 0,

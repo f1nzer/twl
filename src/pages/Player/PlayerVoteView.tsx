@@ -44,6 +44,7 @@ export const PlayerVoteView = ({ players, onVote }: PlayerViewProps) => {
       />
       <Box textAlign={"center"}>
         <Button
+          sx={{ marginBottom: 4 }}
           disabled={!playerToRemove}
           size="large"
           variant="contained"
