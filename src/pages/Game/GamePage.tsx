@@ -5,7 +5,8 @@ import { GameState, GameStatus } from "../../models/state";
 import { VoteView } from "./VoteView";
 import { ADMIN_CONNECTION_LABEL } from "../../models/networking";
 import { usePeerConnection } from "../../hooks/usePeerConnection";
-import { Box, CircularProgress, Container } from "@mui/material";
+import { Box, Container } from "@mui/material";
+import Spinner from "../../components/Spinner";
 
 const GameView = () => {
   const { isConnected, lastMessage, peerId, connection } = usePeerConnection(
@@ -17,7 +18,7 @@ const GameView = () => {
   }
 
   if (!lastMessage) {
-    return <CircularProgress size={512} />;
+    return <Spinner />;
   }
 
   const gameState = lastMessage.data as GameState;

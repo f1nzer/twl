@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import QRCode from "react-qr-code";
-import { Box, CircularProgress, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
+import Spinner from "../../components/Spinner";
 
 interface AdminConnectionViewProps {
   peerId?: string;
@@ -9,7 +10,7 @@ interface AdminConnectionViewProps {
 const QrView = ({ peerId }: AdminConnectionViewProps) => {
   const size = 512;
   if (!peerId) {
-    return <CircularProgress size={size} />;
+    return <Spinner size={size} />;
   }
 
   const adminGameUrl = "admin?gameId=" + peerId;
